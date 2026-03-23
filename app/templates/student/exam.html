@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Global Reset */
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -85,10 +87,11 @@
         .questions-scroll-area {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             padding: 40px;
             overflow-y: auto;
-            flex: 1; /* Take remaining height */
+            flex: 1;
+            /* Take remaining height */
             scroll-behavior: smooth;
         }
 
@@ -104,7 +107,7 @@
 
         .question-block:hover {
             border-color: var(--color-blue-accent);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
         }
 
         .question-block.focusing {
@@ -165,7 +168,7 @@
             background: white;
             padding: 30px 25px;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -184,9 +187,20 @@
         }
 
         @keyframes timerPulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.02); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.02);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .exam-timer {
@@ -232,7 +246,7 @@
             background-color: var(--color-green-accent);
             color: white;
             border-color: var(--color-green-accent);
-            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
         }
 
         .palette-item.focusing {
@@ -249,7 +263,7 @@
             background-color: var(--color-green-accent);
             color: white;
             border-color: var(--color-blue-accent);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 -2px 0 rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 -2px 0 rgba(0, 0, 0, 0.1);
         }
 
         .legend {
@@ -285,28 +299,35 @@
             padding-top: 15px;
         }
 
-        .btn-finish {
-            flex-shrink: 0;
-            background-color: #ef44441a;
-            color: #ef4444;
-            border: 2px solid #ef4444;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
+        .sparkle-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #FFD700;
+            animation: sparklePulse 0.9s ease-out forwards;
+            z-index: 100;
         }
 
-        .btn-finish:hover {
-            background-color: #ef4444;
-            color: white;
+        @keyframes sparklePulse {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
         }
 
         /* Custom Professional Modal */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             display: none;
@@ -328,7 +349,7 @@
             border-radius: 20px;
             width: 100%;
             max-width: 450px;
-            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
             text-align: center;
             transform: translateY(20px);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -388,16 +409,17 @@
         .btn-modal-confirm {
             background: #1e293b;
             color: white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .btn-modal-confirm:hover {
             background: #000000;
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
+
 <body>
 
     <!-- Custom Modal Structure -->
@@ -429,7 +451,8 @@
             <main>
                 <div class="section-tabs">
                     {% for section in sections %}
-                    <div class="section-tab {% if loop.first %}active{% endif %}" onclick="switchSection('{{ section.name }}')" id="tab-{{ section.name }}">
+                    <div class="section-tab {% if loop.first %}active{% endif %}"
+                        onclick="switchSection('{{ section.name }}')" id="tab-{{ section.name }}">
                         {{ section.name }}
                     </div>
                     {% endfor %}
@@ -437,23 +460,34 @@
 
                 <div class="questions-scroll-area" id="questions-area">
                     {% for section in sections %}
-                    <div class="section-content" id="sec-{{ section.name }}" style="display: {% if loop.first %}block{% else %}none{% endif %};">
-                        <div class="section-header-banner" style="background: linear-gradient(to right, #f8fafc, white); padding: 15px 20px; border-radius: 12px; border-left: 6px solid var(--color-blue-accent); margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-                            <h2 style="margin: 0; color: var(--color-dark-bg); font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">{{ section.name }} Section</h2>
-                            <p style="margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 600;">Total Questions: {{ section.questions|length }}</p>
+                    <div class="section-content" id="sec-{{ section.name }}"
+                        style="display: {% if loop.first %}block{% else %}none{% endif %};">
+                        <div class="section-header-banner"
+                            style="background: linear-gradient(to right, #f8fafc, white); padding: 15px 20px; border-radius: 12px; border-left: 6px solid var(--color-blue-accent); margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                            <h2
+                                style="margin: 0; color: var(--color-dark-bg); font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">
+                                {{ section.name }} Section</h2>
+                            <p style="margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 600;">Total
+                                Questions: {{ section.questions|length }}</p>
                         </div>
-                        
+
                         {% for q in section.questions %}
                         <div class="question-block" id="q-{{ q.id }}" data-qid="{{ q.id }}">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                                <span style="font-weight: 700; color: #64748b; font-size: 14px;">QUESTION {{ loop.index }}</span>
-                                <span id="status-{{ q.id }}" style="font-size: 12px; font-weight: 700; color: #94a3b8;">{{ 'ANSWERED' if answers.get(q.id) else 'NOT ANSWERED' }}</span>
+                                <span style="font-weight: 700; color: #64748b; font-size: 14px;">QUESTION {{ loop.index
+                                    }}</span>
+                                <span id="status-{{ q.id }}"
+                                    style="font-size: 12px; font-weight: 700; color: #94a3b8;">{{ 'ANSWERED' if
+                                    answers.get(q.id) else 'NOT ANSWERED' }}</span>
                             </div>
-                            <h3 style="font-size: 20px; margin-bottom: 30px; line-height: 1.6; color: var(--color-dark-bg);">{{ q.text }}</h3>
-                            
+                            <h3
+                                style="font-size: 20px; margin-bottom: 30px; line-height: 1.6; color: var(--color-dark-bg);">
+                                {{ q.text }}</h3>
+
                             <div class="options-list">
                                 {% for key, val in q.options.items() %}
-                                <div class="option-item {{ 'selected' if answers.get(q.id) == key else '' }}" id="opt-{{ q.id }}-{{ key }}" onclick="selectOption('{{ q.id }}', '{{ key }}')">
+                                <div class="option-item {{ 'selected' if answers.get(q.id) == key else '' }}"
+                                    id="opt-{{ q.id }}-{{ key }}" onclick="selectOption('{{ q.id }}', '{{ key }}')">
                                     <div class="option-circle"></div>
                                     <span style="font-size: 16px;">{{ val }}</span>
                                 </div>
@@ -464,13 +498,19 @@
 
                         <div style="padding: 40px 0; text-align: center;">
                             {% if not loop.last %}
-                            <button class="btn-primary" onclick="switchSection('{{ sections[loop.index].name }}')" style="background-color: var(--color-blue-accent); max-width: 300px; font-size: 18px;">
-                                Next Section: {{ sections[loop.index].name }} <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i>
+                            <button class="btn-primary" onclick="switchSection('{{ sections[loop.index].name }}')"
+                                style="background-color: var(--color-blue-accent); max-width: 300px; font-size: 18px;">
+                                Next Section: {{ sections[loop.index].name }} <i class="fa-solid fa-arrow-right"
+                                    style="margin-left: 10px;"></i>
                             </button>
                             {% else %}
-                            <button class="btn-primary" onclick="confirmFinish()" style="background-color: #ef4444; max-width: 300px; font-size: 18px;">
-                                Final Submission <i class="fa-solid fa-check-double" style="margin-left: 10px;"></i>
-                            </button>
+                            <div style="position: relative; display: inline-block;">
+                                <button class="btn-primary" onclick="confirmFinish()" id="finalSubmitBtn"
+                                    style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 16px 40px; border-radius: 15px; font-size: 19px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 auto;">
+                                    Final Submission <i class="fa-solid fa-paper-plane" style="font-size: 20px;"></i>
+                                </button>
+                                <div id="paperBurst" style="position: absolute; top:50%; left:50%; pointer-events: none;"></div>
+                            </div>
                             {% endif %}
                         </div>
                     </div>
@@ -481,16 +521,22 @@
             <aside class="sidebar-panel">
                 <div class="timer-box">
                     <div class="exam-timer" id="exam-timer">00:00:00</div>
-                    <div style="font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 5px; letter-spacing: 1px;">TIME REMAINING</div>
+                    <div
+                        style="font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 5px; letter-spacing: 1px;">
+                        TIME REMAINING</div>
                 </div>
 
-                <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 5px; display: block;">Question Palette</label>
-                
+                <label
+                    style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 5px; display: block;">Question
+                    Palette</label>
+
                 <div class="palette-container">
                     {% for section in sections %}
-                    <div class="palette-grid" id="palette-{{ section.name }}" style="display: {% if loop.first %}grid{% else %}none{% endif %};">
+                    <div class="palette-grid" id="palette-{{ section.name }}"
+                        style="display: {% if loop.first %}grid{% else %}none{% endif %};">
                         {% for q in section.questions %}
-                        <div class="palette-item {{ 'answered' if answers.get(q.id) else '' }}" id="pal-{{ q.id }}" onclick="scrollToQuestion('{{ q.id }}')">
+                        <div class="palette-item {{ 'answered' if answers.get(q.id) else '' }}" id="pal-{{ q.id }}"
+                            onclick="scrollToQuestion('{{ q.id }}')">
                             {{ loop.index }}
                         </div>
                         {% endfor %}
@@ -508,24 +554,24 @@
                         <span>Unanswered</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-color" style="border: 2px solid var(--color-blue-accent); background: #f0f9ff;"></div>
+                        <div class="legend-color"
+                            style="border: 2px solid var(--color-blue-accent); background: #f0f9ff;"></div>
                         <span>Focusing</span>
                     </div>
                 </div>
 
                 <div class="progress-container">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 8px; font-weight: 600;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 8px; font-weight: 600;">
                         <span>OVERALL PROGRESS</span>
                         <span id="progress-text">0%</span>
                     </div>
                     <div style="height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
-                        <div id="progress-fill" style="height: 100%; background: var(--color-green-accent); width: 0%; transition: width 0.4s ease;"></div>
+                        <div id="progress-fill"
+                            style="height: 100%; background: var(--color-green-accent); width: 0%; transition: width 0.4s ease;">
+                        </div>
                     </div>
                 </div>
-
-                <button class="btn-finish" onclick="confirmFinish()">
-                    Finish & Submit Examination
-                </button>
             </aside>
         </div>
     </div>
@@ -536,15 +582,111 @@
         const answerserver = {{ answers | tojson }};
         let currentSection = sectionsData[0].name;
         let answers = answerserver || {};
-        let totalSeconds = {{ config.total_time_minutes }} * 60;
+        
+        // Helper to read cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const studentMobile = getCookie('student_mobile') || 'guest';
+        const LOCAL_STORAGE_KEY = `exam`;
+        const LOCAL_TIME_KEY = `exam_time_${studentMobile}`;
+
+        // Initialize strictly synced timer
+        let serverRemaining = {{ remaining_seconds }};
+        let localRemaining = localStorage.getItem(LOCAL_TIME_KEY);
+        let totalSeconds = serverRemaining;
+        
+        // Prevent refresh advantage by taking the minimum available time
+        if (localRemaining !== null) {
+            localRemaining = parseInt(localRemaining, 10);
+            if (!isNaN(localRemaining) && localRemaining < serverRemaining) {
+                totalSeconds = localRemaining;
+            }
+        }
+
         const ENFORCE_FULLSCREEN = {{ config.enforce_fullscreen | tojson }};
         let violations = 0;
-        const MAX_VIOLATIONS = {{ config.get('exit_attempts_threshold', 3) }} - 1; 
+        const MAX_VIOLATIONS = {{ config.get('exit_attempts_threshold', 3) }} - 1;
+
+        // --- Local Storage Backup Logic ---
+
+        function saveToLocalBackup() {
+            try {
+                // Get existing backup data to preserve other students' data if any
+                const existing = localStorage.getItem(LOCAL_STORAGE_KEY);
+                let backupData = existing ? JSON.parse(existing) : {};
+                
+                // Wrap the current student's data by their mobile number
+                backupData[studentMobile] = answers;
+                
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(backupData));
+                console.log(`💾 Progress saved for ${studentMobile}:`, answers);
+            } catch (e) {
+                console.error("❌ Error saving to local storage:", e);
+            }
+        }
+
+        function restoreFromLocalBackup() {
+            try {
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (saved) {
+                    const backupData = JSON.parse(saved);
+                    const localAnswers = backupData[studentMobile];
+                    
+                    if (localAnswers) {
+                        // Merge local answers into current (server) answers
+                        // Server answers (answerserver) take precedence
+                        answers = { ...localAnswers, ...answers };
+                        console.log(`✅ Restored backup for ${studentMobile}`);
+
+                        // Update the UI for restored answers
+                        Object.entries(answers).forEach(([qid, key]) => {
+                            updateAnswerUI(qid, key);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring from local storage:', e);
+            }
+        }
+
+        function clearLocalBackup() {
+            try {
+                localStorage.removeItem(LOCAL_TIME_KEY);
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (saved) {
+                    let backupData = JSON.parse(saved);
+                    delete backupData[studentMobile];
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(backupData));
+                    console.log(`🗑️ Backup cleared for ${studentMobile}`);
+                }
+            } catch (e) {
+                console.error('Error clearing local storage:', e);
+            }
+        }
+
+        function updateAnswerUI(qid, key) {
+            const palItem = document.getElementById(`pal-${qid}`);
+            if (palItem) palItem.classList.add('answered');
+
+            const optItem = document.getElementById(`opt-${qid}-${key}`);
+            if (optItem) optItem.classList.add('selected');
+
+            const statusEl = document.getElementById(`status-${qid}`);
+            if (statusEl) {
+                statusEl.innerText = 'ANSWERED';
+                statusEl.style.color = 'var(--color-green-accent)';
+            }
+        }
+        // --- End Backup Logic ---
 
         // Security Script
         {% if not config.inspect_allow %}
         document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
+        document.onkeydown = function (e) {
             if (e.keyCode == 123) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
@@ -558,18 +700,12 @@
         document.addEventListener('selectstart', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         {% endif %}
-        
-        // Helper to read cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
+
 
         // Initialize WebSocket for real-time communication
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const ws = new WebSocket(`${protocol}//${window.location.host}/student/ws`);
-        
+
         ws.onopen = () => {
             console.log('WebSocket Connected');
             const mobile = getCookie('student_mobile');
@@ -586,24 +722,18 @@
                 // Restore state from server
                 if (data.answers) {
                     answers = { ...answers, ...data.answers };
+                    saveToLocalBackup(); // Sync local backup with server state
                     // Update UI for restored answers
                     Object.entries(answers).forEach(([qid, key]) => {
-                        const palItem = document.getElementById(`pal-${qid}`);
-                        if (palItem) palItem.classList.add('answered');
-                        
-                        // Select option in UI if it exists in the current page load
-                        const optItem = document.getElementById(`opt-${qid}-${key}`);
-                        if (optItem) optItem.classList.add('selected');
-                        
-                        const statusEl = document.getElementById(`status-${qid}`);
-                        if (statusEl) {
-                            statusEl.innerText = 'ANSWERED';
-                            statusEl.style.color = 'var(--color-green-accent)';
-                        }
+                        updateAnswerUI(qid, key);
                     });
                 }
                 if (data.remaining_seconds !== null && data.remaining_seconds !== undefined) {
-                    totalSeconds = data.remaining_seconds;
+                    // Only accept server time if it's strictly less than our current ticking time
+                    // This prevents stale 30s backups from adding time back upon reconnection
+                    if (data.remaining_seconds < totalSeconds) {
+                        totalSeconds = data.remaining_seconds;
+                    }
                 }
                 updateProgress();
             } else if (data.type === 'pong') {
@@ -679,13 +809,13 @@
             currentSection = name;
             document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${name}`).classList.add('active');
-            
+
             document.querySelectorAll('.section-content').forEach(content => content.style.display = 'none');
             document.getElementById(`sec-${name}`).style.display = 'block';
-            
+
             document.querySelectorAll('.palette-grid').forEach(grid => grid.style.display = 'none');
             document.getElementById(`palette-${name}`).style.display = 'grid';
-            
+
             document.getElementById('questions-area').scrollTop = 0;
             updateProgress();
         }
@@ -699,12 +829,11 @@
             const qBlock = document.getElementById(`q-${qid}`);
             qBlock.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
             document.getElementById(`opt-${qid}-${key}`).classList.add('selected');
-            
+
             answers[qid] = key;
-            document.getElementById(`pal-${qid}`).classList.add('answered');
-            document.getElementById(`status-${qid}`).innerText = 'ANSWERED';
-            document.getElementById(`status-${qid}`).style.color = 'var(--color-green-accent)';
-            
+            saveToLocalBackup(); // Save to local storage backup
+            updateAnswerUI(qid, key);
+
             // Send answer instantly via WebSocket
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
@@ -716,11 +845,11 @@
                 // Fallback to fetch if WebSocket is down
                 fetch('/student/save-answer', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question_id: qid, answer: key })
                 });
             }
-            
+
             updateProgress();
         }
 
@@ -746,28 +875,28 @@
             document.getElementById('modalBody').innerText = body;
             const confirmBtn = document.getElementById('modalConfirm');
             confirmBtn.innerText = confirmText;
-            
+
             modal.classList.add('active');
-            
+
             const handleConfirm = () => {
                 modal.classList.remove('active');
                 confirmBtn.removeEventListener('click', handleConfirm);
                 callback(true);
             };
-            
+
             const handleCancel = () => {
                 modal.classList.remove('active');
                 confirmBtn.removeEventListener('click', handleConfirm);
                 callback(false);
             };
-            
+
             confirmBtn.addEventListener('click', handleConfirm);
             document.getElementById('modalCancel').onclick = handleCancel;
         }
 
         function confirmFinish() {
             showCustomModal(
-                "Final Submission", 
+                "Final Submission",
                 "Are you sure you want to submit your exam? You cannot change your answers after submission.",
                 "Yes, Submit Exam",
                 (confirmed) => {
@@ -779,8 +908,29 @@
             );
         }
 
+        function createSparkles() {
+            const paperBurstCont = document.getElementById('paperBurst');
+            if(!paperBurstCont) return;
+            paperBurstCont.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle-particle';
+                const angle = (i / 30) * Math.PI * 2;
+                const dist = 50 + Math.random() * 50;
+                s.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                s.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                s.style.background = ['#FFD700', '#FFFACD', '#10b981', '#3b82f6'][Math.floor(Math.random() * 4)];
+                paperBurstCont.appendChild(s);
+            }
+        }
+
         async function finishExam() {
             try {
+                // Trigger sparkle animation
+                createSparkles();
+                const btn = document.getElementById('finalSubmitBtn');
+                if (btn) btn.style.transform = 'scale(0.95)';
+
                 // Final state sync
                 if (ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({
@@ -790,16 +940,24 @@
                     }));
                 }
                 await fetch('/student/finish-exam', { method: 'POST' });
-                window.location.href = "/student/results";
+                
+                // Add a small delay so the animation can be seen
+                setTimeout(() => {
+                    window.location.href = "/student/results";
+                }, 800);
             } catch (error) {
                 console.error('Error finishing exam:', error);
-                window.location.href = "/student/results";
+                setTimeout(() => {
+                    window.location.href = "/student/results";
+                }, 800);
             }
         }
 
         // Timer Logic
-        const timerInterval = setInterval(function() {
+        const timerInterval = setInterval(function () {
             totalSeconds--;
+            localStorage.setItem(LOCAL_TIME_KEY, totalSeconds.toString()); // Update local storage securely per second
+
             if (totalSeconds <= 0) {
                 clearInterval(timerInterval);
                 isSubmitting = true;
@@ -813,32 +971,37 @@
                 const hours = Math.floor(totalSeconds / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
-                
+
                 const timerEl = document.getElementById('exam-timer');
                 const timerBox = document.querySelector('.timer-box');
                 const initialSeconds = {{ config.total_time_minutes }} * 60;
-                const ratio = totalSeconds / initialSeconds;
+            const ratio = totalSeconds / initialSeconds;
 
-                if (ratio > 0.5) {
-                    timerEl.style.color = '#10b981'; // Green
-                    timerBox.style.borderColor = '#d1fae5';
-                } else if (ratio > 0.2) {
-                    timerEl.style.color = '#f59e0b'; // Amber
-                    timerBox.style.borderColor = '#fef3c7';
-                } else {
-                    timerEl.style.color = '#ef4444'; // Red
-                    timerBox.style.borderColor = '#fee2e2';
-                }
-
-                timerEl.innerHTML = 
-                    (hours < 10 ? "0" + hours : hours) + ":" + 
-                    (minutes < 10 ? "0" + minutes : minutes) + ":" + 
-                    (seconds < 10 ? "0" + seconds : seconds);
+            if (ratio > 0.5) {
+                timerEl.style.color = '#10b981'; // Green
+                timerBox.style.borderColor = '#d1fae5';
+            } else if (ratio > 0.2) {
+                timerEl.style.color = '#f59e0b'; // Amber
+                timerBox.style.borderColor = '#fef3c7';
+            } else {
+                timerEl.style.color = '#ef4444'; // Red
+                timerBox.style.borderColor = '#fee2e2';
             }
+
+            timerEl.innerHTML =
+                (hours < 10 ? "0" + hours : hours) + ":" +
+                (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds);
+        }
         }, 1000);
 
         setupObserver();
+        restoreFromLocalBackup(); // Initialize from local storage if available
+        saveToLocalBackup();      // Ensure initial answers (from server) are backed up immediately
         updateProgress();
+        
+        console.log("🚀 Exam Initialized. Storage Key:", LOCAL_STORAGE_KEY);
+        console.log("🌐 Current Origin:", window.location.origin);
 
         // Enforced Full-Screen Logic
         if (ENFORCE_FULLSCREEN) {
@@ -856,18 +1019,37 @@
             if (el.requestFullscreen) el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
             else if (el.msRequestFullscreen) el.msRequestFullscreen();
-        }        async function handleFullScreenExit() {
+        }
+
+        async function logViolation(type, reason) {
+            try {
+                await fetch('/administrator/log-violation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type, reason: reason })
+                });
+            } catch (e) {
+                console.error("Failed to log violation:", e);
+            }
+        }
+
+        async function handleFullScreenExit() {
             if (!document.fullscreenElement && !isSubmitting) {
                 violations++;
                 enterFullScreen(); // Force re-entry
-                
+
                 await logViolation("fullscreen_exit", "Exited full-screen mode");
-                
-                showAdminNotice(`SECURITY ALERT: Full-screen exit detected! Violation ${violations}/${MAX_VIOLATIONS+1}`);
-                
+
                 if (violations > MAX_VIOLATIONS) {
-                    showCustomModal("Exam Terminated", "Maximum security violations reached. Submitting automatically.", "OK", () => finishExam());
+                    // Maximum violations reached - force submit immediately without prompt
+                    isSubmitting = true;
+                    showAdminNotice("Maximum violations reached. Auto-submitting...");
+                    const modal = document.getElementById('customModal');
+                    if (modal) modal.classList.remove('active');
+                    
+                    finishExam();
                 } else {
+                    showAdminNotice(`SECURITY ALERT: Full-screen exit detected! Violation ${violations}/${MAX_VIOLATIONS + 1}`);
                     showCustomModal(
                         "Security Warning!",
                         `You exited full-screen mode. This is NOT allowed. You have ${MAX_VIOLATIONS - violations + 1} more attempt(s) before automatic disqualification.`,
@@ -885,7 +1067,7 @@
         };
 
         // Warn before leaving the page (Suppress if submitting)
-        window.onbeforeunload = function(e) {
+        window.onbeforeunload = function (e) {
             if (isSubmitting) return;
             e.preventDefault();
             e.returnValue = ''; // Setting this triggers the browser's default prompt
@@ -893,4 +1075,5 @@
 
     </script>
 </body>
+
 </html>

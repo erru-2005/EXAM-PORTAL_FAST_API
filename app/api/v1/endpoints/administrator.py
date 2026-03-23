@@ -189,7 +189,8 @@ async def save_exam_config(
     full_screen_mode: str = Form(None),
     exit_attempts: int = Form(3),
     real_time_backup: str = Form(None),
-    allow_copy: str = Form(None)
+    allow_copy: str = Form(None),
+    show_results: str = Form(None)
 ):
     if request.cookies.get("admin_session") != "authenticated":
         return RedirectResponse(url="/administrator/")
@@ -205,7 +206,8 @@ async def save_exam_config(
         "enforce_fullscreen": full_screen_mode == "on",
         "exit_attempts_threshold": exit_attempts,
         "real_time_backup": real_time_backup == "on",
-        "allow_copy": allow_copy == "on"
+        "allow_copy": allow_copy == "on",
+        "show_results": show_results == "on" if show_results else (show_results == "on" if request.method == "POST" else config.get('show_results', True))
     })
     
     save_portal_config(config)

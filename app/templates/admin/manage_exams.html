@@ -163,6 +163,18 @@
                             </label>
                         </div>
 
+                        <!-- Show Results Toggle -->
+                        <div class="form-row" style="background-color: #f0fdf4; border-color: #bbf7d0;">
+                            <div class="form-label-group">
+                                <label>Show Results to Student</label>
+                                <p>If disabled, students will only see a Thank You message and attendance pie chart after submission.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="show_results" {% if config.get('show_results', True) %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
                         <button type="submit" class="btn-save-action">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                             Save & Deploy Exam Configuration

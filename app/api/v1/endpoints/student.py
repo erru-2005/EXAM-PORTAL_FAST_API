@@ -103,7 +103,9 @@ async def register_student(
     name: str = Form(...),
     parent_name: str = Form(...),
     college: str = Form(...),
-    mobile: str = Form(...)
+    mobile: str = Form(...),
+    stream: str = Form(...),
+    address: str = Form(...)
 ):
     db = await get_database()
     student_col = db["students"]
@@ -114,7 +116,13 @@ async def register_student(
         # Update existing student if needed (optional, but good for data consistency)
         await student_col.update_one(
             {"mobile": mobile},
-            {"$set": {"parent_name": parent_name, "college": college, "name": name}}
+            {"$set": {
+                "parent_name": parent_name, 
+                "college": college, 
+                "name": name,
+                "stream": stream,
+                "address": address
+            }}
         )
     else:
         await student_col.insert_one({
@@ -122,6 +130,8 @@ async def register_student(
             "parent_name": parent_name,
             "college": college,
             "mobile": mobile,
+            "stream": stream,
+            "address": address,
             "created_at": datetime.now(),
             "status": "active",
             "answers": {}
@@ -181,7 +191,8 @@ async def exam_page(request: Request):
         "request": request,
         "config": config,
         "sections": exam_data["sections"],
-        "answers": student.get("answers", {})
+        "answers": student.get("answers", {}),
+        "remaining_seconds": student.get("remaining_seconds", config.get("total_time_minutes", 60) * 60)
     })
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
@@ -236,6 +247,12 @@ async def results_page(request: Request):
         
     db = await get_database()
     student = await db["students"].find_one({"mobile": mobile})
+    
+    if not student:
+        response = RedirectResponse(url="/student/")
+        response.delete_cookie("student_mobile")
+        return response
+        
     exam_data = parse_exam_questions(EXCEL_PATH)
     
     # Calculate results

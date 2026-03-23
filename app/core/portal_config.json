@@ -15,5 +15,6 @@
     "inspect_allow": false,
     "exit_attempts_threshold": 3,
     "real_time_backup": true,
-    "allow_copy": false
+    "allow_copy": false,
+    "show_results": false
 }
