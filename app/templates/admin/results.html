@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exams Results - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: var(--color-white-off);">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="font-size: 20px; color: var(--color-blue-accent); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-graduation-cap"></i> EXAM PORTAL
+                </h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/administrator/dashboard" class="nav-link">
+                    <i class="fa-solid fa-gauge"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/administrator/students" class="nav-link">
+                    <i class="fa-solid fa-users"></i> <span class="nav-text">Live Monitoring</span>
+                </a>
+                <a href="/administrator/manage-exams" class="nav-link">
+                    <i class="fa-solid fa-file-invoice"></i> <span class="nav-text">Manage Exams</span>
+                </a>
+                <a href="/administrator/results" class="nav-link active">
+                    <i class="fa-solid fa-square-poll-vertical"></i> <span class="nav-text">Results Analysis</span>
+                </a>
+                <a href="/administrator/reset-password" class="nav-link">
+                    <i class="fa-solid fa-key"></i> <span class="nav-text">Security</span>
+                </a>
+                <a href="/administrator/logout" class="nav-link" style="margin-top: 50px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <style>
+            .main-wrapper { max-width: 100% !important; flex-grow: 1; padding-right: 20px; }
+            .admin-table-bordered { width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; }
+            .admin-table-bordered th { border: 1px solid #e2e8f0; background: #f8fafc; padding: 12px; font-size: 13px; text-transform: uppercase; color: #475569; }
+            .admin-table-bordered td { border: 1px solid #e2e8f0; padding: 12px; font-size: 14px; vertical-align: middle; }
+            
+            .row-high { background-color: #f0fdf4; color: #166534; }
+            .row-med { background-color: #fefce8; color: #854d0e; }
+            .row-low { background-color: #fff1f2; color: #9f1239; }
+            
+            .sec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .sec-tag { background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); font-size: 11px; }
+        </style>
+
+        <div class="main-wrapper">
+            <div class="college-header-wrapper">
+                <div class="college-header">
+                    <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
+                    <div class="header-text-container">
+                        <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                        <div class="header-separator"></div>
+                        <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-body">
+                <div class="card" style="padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-square-poll-vertical"></i> Detailed Results Analysis</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="refreshList()" class="admin-btn-secondary"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                            <button onclick="exportExcel()" class="admin-btn-secondary"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+                            <button onclick="deleteAllResults()" class="admin-btn-danger" style="background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;"><i class="fa-solid fa-trash-can"></i> Delete All</button>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Overall Score</th>
+                                    <th>Accuracy</th>
+                                    <th style="padding:15px; text-align:left;">SECTION BREAKDOWN</th>
+                                    <th style="padding:15px; text-align:left;">COMPLETION DATE/TIME</th>
+                                    <th style="padding:15px; text-align:center;">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fullResultsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function refreshList() {
+            const res = await fetch('/administrator/students-list');
+            const data = await res.json();
+            const list = document.getElementById('fullResultsList');
+            
+            // Sort by score high to low
+            data.sort((a,b) => b.total_score - a.total_score);
+
+            list.innerHTML = data.filter(s => s.status === 'completed').map(s => {
+                const sectionBadges = Object.entries(s.section_wise).map(([name, score]) => `
+                    <div class="sec-tag">${name}: <strong>${score}</strong></div>
+                `).join('');
+                
+                let rowClass = 'row-low';
+                if(s.total_score >= 15) rowClass = 'row-high'; // Assuming higher total for results
+                else if(s.total_score >= 8) rowClass = 'row-med';
+
+                // Accuracy calculation (assuming 30 total questions for example, or based on sum of section scores)
+                const totalPossible = Object.values(s.section_wise).length > 0 ? 30 : 1; 
+
+                return `
+                    <tr class="${rowClass}">
+                        <td><strong>${s.name}</strong><br><small>${s.mobile}</small></td>
+                        <td style="text-align:center"><span style="font-size:18px; font-weight:800;">${s.total_score}</span></td>
+                        <td>
+                            <div style="width:100%; height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden;">
+                                <div style="width:${(s.total_score/30)*100}%; height:100%; background:currentColor;"></div>
+                            </div>
+                            <small>${Math.round((s.total_score / 30) * 100)}%</small>
+                        </td> 
+                        <td><div class="sec-grid">${sectionBadges}</div></td>
+                        <td style="font-size:13px; opacity:0.8">${s.completed_at ? new Date(s.completed_at).toLocaleString() : 'N/A'}</td>
+                        <td><button onclick="deleteResult('${s.mobile}', '${s.name}')" class="admin-btn-danger" style="padding: 6px 10px; font-size: 12px;"><i class="fa-solid fa-trash"></i> Delete</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function deleteResult(mobile, name) {
+            const confirmation = prompt(`To delete the result for "${name}" (${mobile}), please type "DELETE" below:`);
+            
+            if (confirmation === "DELETE") {
+                try {
+                    const response = await fetch(`/administrator/delete-student/${mobile}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    
+                    if (result.status === "success") {
+                        alert("Result deleted successfully.");
+                        refreshList();
+                    } else {
+                        alert("Error: " + result.message);
+                    }
+                } catch (err) {
+                    alert("Failed to delete: " + err.message);
+                }
+            } else if (confirmation !== null) {
+                alert("Incorrect confirmation text. Deletion canceled.");
+            }
+        }
+
+        async function deleteAllResults() {
+            const confirmation = prompt(`CRITICAL ACTION: This will PERMANENTLY DELETE ALL student results. To proceed, please type "DELETE ALL" below:`);
+            
+            if (confirmation === "DELETE ALL") {
+                try {
+                    const response = await fetch(`/administrator/delete-all-students`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    
+                    if (result.status === "success") {
+                        alert(`Successfully deleted ${result.deleted_count} records.`);
+                        refreshList();
+                    } else {
+                        alert("Error: " + result.message);
+                    }
+                } catch (err) {
+                    alert("Failed to delete all: " + err.message);
+                }
+            } else if (confirmation !== null) {
+                alert("Incorrect confirmation text. Global deletion canceled.");
+            }
+        }
+
+        window.onload = refreshList;
+    </script>
+</body>
+</html>

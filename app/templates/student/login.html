@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - {{ exam_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a8a, #2563eb);
+            --card-shadow: 0 40px 70px -15px rgba(30, 58, 138, 0.12), 0 20px 40px -20px rgba(59, 130, 246, 0.15);
+            --pulse-color: #3b82f6;
+            --circuit-line: rgba(255, 255, 255, 0.25);
+            --node-color: rgba(59, 130, 246, 0.2);
+        }
+
+        body {
+            background-color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 120px);
+            padding: 20px 5%;
+            gap: 50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 580px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {% if show_animations %}, cardShadowPulse 4s ease-in-out infinite alternate{% endif %};
+            position: relative;
+            z-index: 20;
+        }
+
+        @keyframes cardShadowPulse {
+            0% {
+                box-shadow: 0 40px 70px -15px rgba(30, 58, 138, 0.12), 0 20px 40px -20px rgba(59, 130, 246, 0.15);
+            }
+
+            100% {
+                box-shadow: 0 45px 80px -10px rgba(30, 58, 138, 0.18), 0 25px 50px -15px rgba(59, 130, 246, 0.3);
+            }
+        }
+
+        /* Complex Branched Circuit Backdrop */
+        .circuit-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1000px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .circuit-line {
+            fill: none;
+            stroke: var(--circuit-line);
+            stroke-width: 0.6;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            opacity: 1;
+        }
+
+        .current-pulse {
+            fill: none;
+            stroke: var(--pulse-color);
+            stroke-width: 0.8;
+            stroke-dasharray: 70, 430;
+            stroke-dashoffset: 500;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px var(--pulse-color));
+            animation: flowThroughCircuit 6s linear infinite;
+        }
+
+        .pulse-trail {
+            fill: none;
+            stroke: var(--pulse-color);
+            stroke-width: 0.6;
+            stroke-dasharray: 120, 380;
+            stroke-dashoffset: 500;
+            stroke-linecap: round;
+            opacity: 0.2;
+            filter: blur(1.5px);
+            animation: flowThroughCircuit 6s linear infinite;
+        }
+
+        @keyframes flowThroughCircuit {
+            from {
+                stroke-dashoffset: 1000;
+            }
+
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .circuit-node {
+            fill: var(--node-color);
+            transition: all 0.3s;
+            r: 1.5;
+        }
+
+        .exam-title-container {
+            margin-bottom: 40px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .exam-main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(to right, #1e3a8a, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+
+        .illustration-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1.2s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        .illustration-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 30px;
+            filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.12));
+            position: relative;
+            z-index: 15;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-icon-group {
+            position: relative;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-group i {
+            position: absolute;
+            left: 20px;
+            color: #3b82f6;
+            font-size: 18px;
+            z-index: 5;
+        }
+
+        .input-icon-group .country-code {
+            position: absolute;
+            left: 55px;
+            font-weight: 700;
+            color: #475569;
+            z-index: 5;
+        }
+
+        /* Input Field Base & Focus Styling */
+        .input-icon-group input {
+            width: 100%;
+            padding: 16px 16px 16px 55px;
+            border-radius: 15px;
+            border: 2.5px solid #f1f5f9;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #f8fafc;
+            color: #1e293b;
+            box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+        }
+
+        .input-icon-group.mobile-input-wrapper input {
+            padding-left: 95px !important;
+        }
+
+        .input-icon-group input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
+            {% if show_animations %}animation: fieldFocusPulse 2s ease-in-out infinite alternate;{% endif %}
+        }
+
+        @keyframes fieldFocusPulse {
+            0% {
+                box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.12);
+            }
+
+            100% {
+                box-shadow: 0 12px 30px -3px rgba(59, 130, 246, 0.22);
+            }
+        }
+
+        .btn-start-exam {
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.3);
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start-exam:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(30, 58, 138, 0.4);
+        }
+
+        .sparkle-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700;
+            animation: sparklePulse 0.8s ease-out forwards;
+        }
+
+        @keyframes sparklePulse {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1150px) {
+            .login-wrapper {
+                flex-direction: column;
+                padding: 40px 20px;
+                gap: 40px;
+            }
+
+            .illustration-container {
+                order: -1;
+            }
+
+            .illustration-image {
+                max-width: 75%;
+            }
+
+            .circuit-bg {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body style="background-color: #f1f5f9;">
+
+    <div class="college-header-wrapper">
+        <div class="college-header">
+            <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
+            <div class="header-text-container">
+                <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                <div class="header-separator"></div>
+                <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+                <p class="header-meta">Accredited by NAAC with B++ Grade, Affiliated to Mangalore University, Karnataka
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-wrapper">
+        {% if show_animations %}
+        <!-- Complex Branched Circuit Backdrop -->
+        <svg class="circuit-bg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+            <!-- Central Connection Paths (Image to Card) -->
+            <!-- Path A: High Branch -->
+            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="circuit-line" />
+            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="pulse-trail"
+                style="animation-delay: -1s;" />
+            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="current-pulse"
+                style="animation-delay: -1s;" />
+
+            <!-- Path B: Mid Upper -->
+            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="circuit-line" />
+            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="pulse-trail"
+                style="animation-delay: -2s;" />
+            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="current-pulse"
+                style="animation-delay: -2s;" />
+
+            <!-- Path C: The Main Zig-Zag -->
+            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="circuit-line" />
+            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="pulse-trail"
+                style="animation-duration: 3.5s;" />
+            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="current-pulse"
+                style="animation-duration: 3.5s;" />
+
+            <!-- Path D: Lower Branch -->
+            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="circuit-line" />
+            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="pulse-trail"
+                style="animation-delay: -3.5s;" />
+            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="current-pulse"
+                style="animation-delay: -3.5s;" />
+
+            <!-- Path E: Deep Lower -->
+            <path d="M800,550 L550,550 L550,450 L200,450" class="circuit-line" />
+            <path d="M800,550 L550,550 L550,450 L200,450" class="pulse-trail" style="animation-delay: -0.5s;" />
+            <path d="M800,550 L550,550 L550,450 L200,450" class="current-pulse" style="animation-delay: -0.5s;" />
+
+            <!-- Nodes (Circuit Joints) -->
+            <circle cx="650" cy="100" class="circuit-node" />
+            <circle cx="400" cy="50" class="circuit-node" />
+            <circle cx="700" cy="250" class="circuit-node" />
+            <circle cx="350" cy="150" class="circuit-node" />
+            <circle cx="750" cy="300" class="circuit-node" />
+            <circle cx="500" cy="350" class="circuit-node" />
+            <circle cx="600" cy="450" class="circuit-node" />
+            <circle cx="800" cy="300" class="circuit-node" />
+            <circle cx="650" cy="250" class="circuit-node" />
+            <circle cx="450" cy="350" class="circuit-node" />
+        </svg>
+        {% endif %}
+
+        <!-- Form Side -->
+        <div class="login-card">
+            <div class="exam-title-container">
+                <h1 class="exam-main-title">{{ exam_name }}</h1>
+                <div style="height: 4px; width: 60px; background: #3b82f6; margin: 15px auto; border-radius: 2px;">
+                </div>
+            </div>
+
+            <form action="/student/register" method="post" id="loginForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-icon-group">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <input type="text" id="name" name="name" required placeholder="Ex: Rahul Sharma">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="parent_name">Parent Name</label>
+                    <div class="input-icon-group">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <input type="text" id="parent_name" name="parent_name" required placeholder="Ex: Suresh Sharma">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="college">PUC College Name</label>
+                    <div class="input-icon-group">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <input type="text" id="college" name="college" required placeholder="Ex: ABC PU College">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <div class="input-icon-group mobile-input-wrapper">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span class="country-code">+91</span>
+                        <input type="tel" id="mobile" name="mobile" required maxlength="10"
+                            placeholder="10 Digit Number">
+                        <div class="validation-tick" id="validationTick"
+                            style="position: absolute; right: 20px; opacity: 0; transform: scale(0.5); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                            <i class="fa-solid fa-circle-check"
+                                style="color: #10b981; font-size: 22px; position: static;"></i>
+                            <div class="paper-burst" id="paperBurst" style="position: absolute; top:50%; left:50%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-start-exam" id="submitBtn" disabled
+                    style="opacity: 0.6; cursor: not-allowed;">
+                    Begin Examination <i class="fa-solid fa-arrow-right-long"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Illustration Side -->
+        <div class="illustration-container">
+            <img src="/static/assets/professional-growth-and-academic-achievement-illustration-svg-download-png-13863377.webp"
+                alt="Academic Achievement" class="illustration-image">
+        </div>
+    </div>
+
+
+
+    <script>
+        const mobileInput = document.getElementById('mobile');
+        const validationTick = document.getElementById('validationTick');
+        const submitBtn = document.getElementById('submitBtn');
+        const paperBurstCont = document.getElementById('paperBurst');
+
+        function createSparkles() {
+            paperBurstCont.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle-particle';
+                const angle = (i / 20) * Math.PI * 2;
+                const dist = 40 + Math.random() * 30;
+                s.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                s.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                s.style.background = ['#FFD700', '#FFFACD', '#10b981'][Math.floor(Math.random() * 3)];
+                paperBurstCont.appendChild(s);
+            }
+        }
+
+        mobileInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+
+            if (e.target.value.length === 10) {
+                if (validationTick.style.opacity === '0') {
+                    validationTick.style.opacity = '1';
+                    validationTick.style.transform = 'scale(1)';
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                    createSparkles();
+                }
+            } else {
+                validationTick.style.opacity = '0';
+                validationTick.style.transform = 'scale(0.5)';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        });
+
+        mobileInput.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) e.preventDefault();
+        });
+
+        // Security Script
+        {% if not config.inspect_allow %}
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+        {% endif %}
+
+        {% if not config.allow_copy %}
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
+        {% endif %}
+    </script>
+
+
+
+    <script>
+        {% if config.enforce_fullscreen %}
+        document.addEventListener('click', async () => {
+            if (!document.fullscreenElement) {
+                try {
+                    const el = document.documentElement;
+                    if (el.requestFullscreen) await el.requestFullscreen();
+                    else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+                } catch (err) {}
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                logViolation("fullscreen_exit_login", "User exited full-screen on login page");
+            }
+        });
+        {% endif %}
+
+        async function logViolation(type, reason) {
+            try {
+                await fetch('/administrator/log-violation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type, reason: reason })
+                });
+            } catch (e) {}
+        }
+
+        // Right click protection with logging
+        {% if not config.inspect_allow %}
+        document.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            logViolation("right_click", "Right click attempted on login page");
+        });
+        {% endif %}
+    </script>
+</body>
+
+</html>

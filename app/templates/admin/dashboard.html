@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - EXAM PORTAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: var(--color-white-off);">
+    
+    <div class="app-container">
+        <!-- Persistent Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="font-size: 20px; color: var(--color-blue-accent); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-graduation-cap"></i> EXAM PORTAL
+                </h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/administrator/dashboard" class="nav-link active">
+                    <i class="fa-solid fa-gauge"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/administrator/students" class="nav-link">
+                    <i class="fa-solid fa-users"></i> <span class="nav-text">Students</span>
+                </a>
+                <a href="/administrator/manage-exams" class="nav-link">
+                    <i class="fa-solid fa-file-invoice"></i> <span class="nav-text">Manage Exams</span>
+                </a>
+                <a href="/administrator/results" class="nav-link">
+                    <i class="fa-solid fa-square-poll-vertical"></i> <span class="nav-text">Results</span>
+                </a>
+                <a href="/administrator/reset-password" class="nav-link">
+                    <i class="fa-solid fa-key"></i> <span class="nav-text">Security</span>
+                </a>
+                <a href="/administrator/logout" class="nav-link" style="margin-top: 50px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            <div class="college-header-wrapper">
+                <div class="college-header">
+                    <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
+                    <div class="header-text-container">
+                        <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                        <div class="header-separator"></div>
+                        <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+                        <p class="header-meta">Accredited by NAAC with B++ Grade, Affiliated to Mangalore University, Karnataka</p>
+                    </div>
+                </div>
+                <div class="header-bottom-bar">
+                    <span class="header-admin-text"><i class="fa-solid fa-user-shield"></i> Welcome Admin</span>
+                    <a href="/administrator/reset-password" class="header-action-link"><i class="fa-solid fa-key"></i> Reset Password</a>
+                </div>
+            </div>
+
+            <div class="admin-body">
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-left-color: var(--color-green-accent);">
+                        <div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                        <div class="stat-details">
+                            <h3>Active Students</h3>
+                            <p class="stat-value" id="stat-active-now">{{ active_now }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--color-blue-accent);">
+                        <div class="stat-icon"><i class="fa-solid fa-clipboard-question"></i></div>
+                        <div class="stat-details">
+                            <h3>Total Enrollments</h3>
+                            <p class="stat-value" id="stat-total-students">{{ total_students }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--color-brown-base);">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div class="stat-details">
+                            <h3>Completed Exams</h3>
+                            <p class="stat-value" id="stat-completed-exams">{{ completed_students }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #f1c40f;">
+                        <div class="stat-icon"><i class="fa-solid fa-square-poll-vertical"></i></div>
+                        <div class="stat-details">
+                            <h3>Pending Results</h3>
+                            <p class="stat-value">4</p>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="card" style="padding: 25px;">
+                        <h3 style="margin-bottom: 20px; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-gears"></i> Feature Controls</h3>
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                <div>
+                                    <h4 style="margin: 0; color: #1e293b;">Login Page Animations</h4>
+                                    <p style="margin: 5px 0 0; font-size: 13px; color: #64748b;">Toggle complex circuit animations and pulsing glows.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="animationToggle" {% if config.show_login_animations %}checked{% endif %}>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                <div>
+                                    <h4 style="margin: 0; color: #1e293b;">Enforced Full-Screen Mode</h4>
+                                    <p style="margin: 5px 0 0; font-size: 13px; color: #64748b;">Automatically expand to full screen. Auto-submit on violation.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="fullscreenToggle" {% if config.enforce_fullscreen %}checked{% endif %}>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Monitoring Section -->
+                    <div class="card" style="margin-top: 20px; padding: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                            <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-users-viewfinder"></i> Live Student Monitoring</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="sortStudents" class="admin-select" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <option value="name">Sort by Name (A-Z)</option>
+                                    <option value="score">Sort by Marks (High-Low)</option>
+                                    <option value="time">Sort by Completion Time</option>
+                                    <option value="violations">Sort by Violations</option>
+                                </select>
+                                <button onclick="refreshStudents()" class="admin-btn-secondary"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x: auto;">
+                            <table class="admin-table" id="studentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Status</th>
+                                        <th>Violations</th>
+                                        <th>Time</th>
+                                        <th>Score (Overall)</th>
+                                        <th>Section Scores</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentList">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    .admin-table th { text-align: left; padding: 15px; background: #f1f5f9; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; }
+                    .admin-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
+                    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+                    .status-active { background: #dcfce7; color: #166534; }
+                    .status-completed { background: #e0f2fe; color: #0369a1; }
+                    .violation-badge { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-weight: 700; }
+                    .sec-score-tiny { display: inline-block; font-size: 10px; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; margin-right: 4px; }
+                    
+                    /* Modal Styles */
+                    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+                    .modal-card { background: white; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+                    .modal-header { padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+                    .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
+                    .backup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                    .q-set-box { padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+                    .q-answered { border-left: 4px solid #10b981; background: #f0fdf4; }
+                    .q-unanswered { border-left: 4px solid #ef4444; background: #fef2f2; }
+
+                    /* Toggle Switch Style */
+                    .switch { position: relative; display: inline-block; width: 54px; height: 28px; }
+                    .switch input { opacity: 0; width: 0; height: 0; }
+                    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
+                    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+                    input:checked + .slider { background-color: #3b82f6; }
+                    input:checked + .slider:before { transform: translateX(26px); }
+                </style>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Viewer Modal -->
+    <div id="backupModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalStudentName" style="margin: 0; color: var(--color-dark-bg);">Student Backup</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}/administrator/admin-ws`);
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'stats') {
+                if (data.active_now !== undefined) document.getElementById('stat-active-now').innerText = data.active_now;
+                if (data.total_enrollments !== undefined) document.getElementById('stat-total-students').innerText = data.total_enrollments;
+                if (data.completed_exams !== undefined) document.getElementById('stat-completed-exams').innerText = data.completed_exams;
+                refreshStudents(); 
+            }
+        };
+
+        async function refreshStudents() {
+            try {
+                const response = await fetch('/administrator/students');
+                let students = await response.json();
+                
+                const sortVal = document.getElementById('sortStudents').value;
+                if (sortVal === 'name') students.sort((a,b) => a.name.localeCompare(b.name));
+                else if (sortVal === 'score') students.sort((a,b) => b.total_score - a.total_score);
+                else if (sortVal === 'violations') students.sort((a,b) => b.violation_count - a.violation_count);
+                else if (sortVal === 'time') students.sort((a,b) => {
+                    const timeA = a.completed_at || a.last_active || "";
+                    const timeB = b.completed_at || b.last_active || "";
+                    return timeB.localeCompare(timeA);
+                });
+
+                const list = document.getElementById('studentList');
+                list.innerHTML = students.map(s => {
+                    const timeStr = s.completed_at ? new Date(s.completed_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Active';
+                    const sectionsHtml = Object.entries(s.section_wise).map(([name, score]) => `
+                        <span class="sec-score-tiny" title="${name}">${name}: <strong>${score}</strong></span>
+                    `).join('');
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 600;">${s.name}</td>
+                            <td><span class="status-pill status-${s.status}">${s.status.toUpperCase()}</span></td>
+                            <td><span class="violation-badge">${s.violation_count}</span></td>
+                            <td style="font-size: 12px; color: #64748b;">${timeStr}</td>
+                            <td><strong>${s.total_score}</strong></td>
+                            <td style="max-width: 200px;">${sectionsHtml}</td>
+                            <td>
+                                <button onclick="viewBackup('${s.mobile}')" class="admin-btn-secondary" style="padding: 5px 12px; font-size: 12px;">View Backup</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) { console.error('Failed to load students:', err); }
+        }
+
+        async function viewBackup(mobile) {
+            document.getElementById('backupModal').style.display = 'flex';
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = '<div style="text-align:center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p>Loading Backup Data...</p></div>';
+            
+            try {
+                const response = await fetch(`/administrator/student-backup/${mobile}`);
+                const data = await response.json();
+                
+                document.getElementById('modalStudentName').innerText = `${data.name} - Exam Progress`;
+                
+                modalContent.innerHTML = data.sections.map(sec => `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; color: var(--color-blue-accent);">${sec.name}</h4>
+                        <div class="backup-grid">
+                            ${sec.questions.map((q, idx) => `
+                                <div class="q-set-box ${q.answered ? 'q-answered' : 'q-unanswered'}">
+                                    <p style="margin: 0 0 8px; font-weight: 600; font-size: 13px;">Question ${idx+1}</p>
+                                    <p style="margin: 0; font-size: 13px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${q.text}</p>
+                                    <div style="margin-top: 10px; font-size: 12px;">
+                                        ${q.answered ? `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> Answered: <strong>${q.student_answer}</strong></span>` 
+                                                     : `<span style="color: #ef4444;"><i class="fa-solid fa-circle-xmark"></i> Unanswered</span>`}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { modalContent.innerHTML = '<p style="color:red;">Error loading backup.</p>'; }
+        }
+
+        function closeModal() { document.getElementById('backupModal').style.display = 'none'; }
+
+        // Toggles
+        document.getElementById('animationToggle').addEventListener('change', async (e) => {
+            await updateToggle('/administrator/toggle-animations', { show_animations: e.target.checked });
+        });
+
+        document.getElementById('fullscreenToggle').addEventListener('change', async (e) => {
+            await updateToggle('/administrator/toggle-fullscreen', { enforce_fullscreen: e.target.checked });
+        });
+
+        async function updateToggle(url, body) {
+            try {
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+                if (!res.ok) throw new Error();
+            } catch (err) { alert('Failed to update setting'); refreshStudents(); }
+        }
+
+        window.onload = refreshStudents;
+        setInterval(refreshStudents, 30000); // Periodic refresh
+    </script>
+</body>
+</html>

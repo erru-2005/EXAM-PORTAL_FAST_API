@@ -1,0 +1,19 @@
+{
+    "exam_name": "General Entrance Examination 2026",
+    "motivation_message": "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
+    "instructions": [
+        "Please ensure you have a stable internet connection throughout the exam.",
+        "Do not refresh the page or navigate away once the exam has started.",
+        "All questions are multiple-choice. Select the best option.",
+        "The exam will automatically submit when the timer reaches zero.",
+        "Your progress is backed up in real-time."
+    ],
+    "total_time_minutes": 60,
+    "start_time": "2026-03-22T12:20",
+    "enforce_fullscreen": true,
+    "show_login_animations": true,
+    "inspect_allow": false,
+    "exit_attempts_threshold": 3,
+    "real_time_backup": true,
+    "allow_copy": false
+}

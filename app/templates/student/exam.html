@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examination - {{ config.exam_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Reset */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--color-white-off);
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .college-header-wrapper {
+            flex-shrink: 0;
+            background: white;
+            padding: 10px 40px;
+            border-bottom: 2px solid #ddd;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .exam-layout {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 25px;
+            padding: 20px;
+            max-width: 1750px;
+            margin: 0 auto;
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Main Area (Questions) */
+        main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .section-tabs {
+            flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            overflow-x: auto;
+            padding-top: 5px;
+        }
+
+        .section-tab {
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .section-tab.active {
+            background-color: var(--color-blue-accent);
+            color: white;
+        }
+
+        .questions-scroll-area {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            padding: 40px;
+            overflow-y: auto;
+            flex: 1; /* Take remaining height */
+            scroll-behavior: smooth;
+        }
+
+        .question-block {
+            padding: 35px;
+            border: 2px solid #f1f5f9;
+            border-radius: 18px;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+        }
+
+        .question-block:hover {
+            border-color: var(--color-blue-accent);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        }
+
+        .question-block.focusing {
+            border-color: var(--color-blue-accent);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+            background-color: #fcfdfe;
+            transform: translateY(-2px);
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: var(--color-blue-accent);
+            background-color: #f8fafc;
+        }
+
+        .option-item.selected {
+            border-color: var(--color-green-accent);
+            background-color: #f0fdf4;
+        }
+
+        .option-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-item.selected .option-circle {
+            border-color: var(--color-green-accent);
+            background-color: var(--color-green-accent);
+        }
+
+        .option-item.selected .option-circle::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Sidebar Sidebar */
+        .sidebar-panel {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .timer-box {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 15px;
+            border: 3px solid #fee2e2;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            animation: timerPulse 2s infinite;
+        }
+
+        @keyframes timerPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .exam-timer {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ef4444;
+            letter-spacing: 1px;
+        }
+
+        .palette-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-bottom: 20px;
+            padding: 0 5px;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            justify-items: center;
+        }
+
+        .palette-item {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            border: 2px solid #eef2f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #64748b;
+        }
+
+        .palette-item.answered {
+            background-color: var(--color-green-accent);
+            color: white;
+            border-color: var(--color-green-accent);
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+        }
+
+        .palette-item.focusing {
+            border: 2px solid var(--color-blue-accent);
+            color: var(--color-blue-accent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 5px rgba(59, 130, 246, 0.3);
+            background-color: #f0f9ff;
+            transform: scale(1.18);
+            z-index: 20;
+            font-weight: 800;
+        }
+
+        .palette-item.answered.focusing {
+            background-color: var(--color-green-accent);
+            color: white;
+            border-color: var(--color-blue-accent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 -2px 0 rgba(0,0,0,0.1);
+        }
+
+        .legend {
+            flex-shrink: 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .progress-container {
+            flex-shrink: 0;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-finish {
+            flex-shrink: 0;
+            background-color: #ef44441a;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-finish:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Custom Professional Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3);
+            text-align: center;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 12px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-modal-cancel {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-modal-confirm {
+            background: #1e293b;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn-modal-confirm:hover {
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Modal Structure -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-circle-question"></i></div>
+            <div class="modal-title" id="modalTitle">Confirm Action</div>
+            <div class="modal-body" id="modalBody">Are you sure you want to proceed with this action?</div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-modal btn-modal-confirm" id="modalConfirm">Yes, Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <div class="college-header-wrapper">
+            <div class="college-header">
+                <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
+                <div class="header-text-container">
+                    <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                    <div class="header-separator"></div>
+                    <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="exam-layout">
+            <main>
+                <div class="section-tabs">
+                    {% for section in sections %}
+                    <div class="section-tab {% if loop.first %}active{% endif %}" onclick="switchSection('{{ section.name }}')" id="tab-{{ section.name }}">
+                        {{ section.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="questions-scroll-area" id="questions-area">
+                    {% for section in sections %}
+                    <div class="section-content" id="sec-{{ section.name }}" style="display: {% if loop.first %}block{% else %}none{% endif %};">
+                        <div class="section-header-banner" style="background: linear-gradient(to right, #f8fafc, white); padding: 15px 20px; border-radius: 12px; border-left: 6px solid var(--color-blue-accent); margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                            <h2 style="margin: 0; color: var(--color-dark-bg); font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">{{ section.name }} Section</h2>
+                            <p style="margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 600;">Total Questions: {{ section.questions|length }}</p>
+                        </div>
+                        
+                        {% for q in section.questions %}
+                        <div class="question-block" id="q-{{ q.id }}" data-qid="{{ q.id }}">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <span style="font-weight: 700; color: #64748b; font-size: 14px;">QUESTION {{ loop.index }}</span>
+                                <span id="status-{{ q.id }}" style="font-size: 12px; font-weight: 700; color: #94a3b8;">{{ 'ANSWERED' if answers.get(q.id) else 'NOT ANSWERED' }}</span>
+                            </div>
+                            <h3 style="font-size: 20px; margin-bottom: 30px; line-height: 1.6; color: var(--color-dark-bg);">{{ q.text }}</h3>
+                            
+                            <div class="options-list">
+                                {% for key, val in q.options.items() %}
+                                <div class="option-item {{ 'selected' if answers.get(q.id) == key else '' }}" id="opt-{{ q.id }}-{{ key }}" onclick="selectOption('{{ q.id }}', '{{ key }}')">
+                                    <div class="option-circle"></div>
+                                    <span style="font-size: 16px;">{{ val }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div style="padding: 40px 0; text-align: center;">
+                            {% if not loop.last %}
+                            <button class="btn-primary" onclick="switchSection('{{ sections[loop.index].name }}')" style="background-color: var(--color-blue-accent); max-width: 300px; font-size: 18px;">
+                                Next Section: {{ sections[loop.index].name }} <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i>
+                            </button>
+                            {% else %}
+                            <button class="btn-primary" onclick="confirmFinish()" style="background-color: #ef4444; max-width: 300px; font-size: 18px;">
+                                Final Submission <i class="fa-solid fa-check-double" style="margin-left: 10px;"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </main>
+
+            <aside class="sidebar-panel">
+                <div class="timer-box">
+                    <div class="exam-timer" id="exam-timer">00:00:00</div>
+                    <div style="font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 5px; letter-spacing: 1px;">TIME REMAINING</div>
+                </div>
+
+                <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 5px; display: block;">Question Palette</label>
+                
+                <div class="palette-container">
+                    {% for section in sections %}
+                    <div class="palette-grid" id="palette-{{ section.name }}" style="display: {% if loop.first %}grid{% else %}none{% endif %};">
+                        {% for q in section.questions %}
+                        <div class="palette-item {{ 'answered' if answers.get(q.id) else '' }}" id="pal-{{ q.id }}" onclick="scrollToQuestion('{{ q.id }}')">
+                            {{ loop.index }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-green-accent);"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="border: 1px solid #ddd; background: white;"></div>
+                        <span>Unanswered</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="border: 2px solid var(--color-blue-accent); background: #f0f9ff;"></div>
+                        <span>Focusing</span>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 8px; font-weight: 600;">
+                        <span>OVERALL PROGRESS</span>
+                        <span id="progress-text">0%</span>
+                    </div>
+                    <div style="height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
+                        <div id="progress-fill" style="height: 100%; background: var(--color-green-accent); width: 0%; transition: width 0.4s ease;"></div>
+                    </div>
+                </div>
+
+                <button class="btn-finish" onclick="confirmFinish()">
+                    Finish & Submit Examination
+                </button>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+
+        const sectionsData = {{ sections | tojson }};
+        const answerserver = {{ answers | tojson }};
+        let currentSection = sectionsData[0].name;
+        let answers = answerserver || {};
+        let totalSeconds = {{ config.total_time_minutes }} * 60;
+        const ENFORCE_FULLSCREEN = {{ config.enforce_fullscreen | tojson }};
+        let violations = 0;
+        const MAX_VIOLATIONS = {{ config.get('exit_attempts_threshold', 3) }} - 1; 
+
+        // Security Script
+        {% if not config.inspect_allow %}
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+        {% endif %}
+
+        {% if not config.allow_copy %}
+        document.body.style.userSelect = "none";
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
+        {% endif %}
+        
+        // Helper to read cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Initialize WebSocket for real-time communication
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}/student/ws`);
+        
+        ws.onopen = () => {
+            console.log('WebSocket Connected');
+            const mobile = getCookie('student_mobile');
+            if (mobile) {
+                ws.send(JSON.stringify({ type: 'join', mobile: mobile }));
+            }
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'admin_message') {
+                showAdminNotice(data.message);
+            } else if (data.type === 'state') {
+                // Restore state from server
+                if (data.answers) {
+                    answers = { ...answers, ...data.answers };
+                    // Update UI for restored answers
+                    Object.entries(answers).forEach(([qid, key]) => {
+                        const palItem = document.getElementById(`pal-${qid}`);
+                        if (palItem) palItem.classList.add('answered');
+                        
+                        // Select option in UI if it exists in the current page load
+                        const optItem = document.getElementById(`opt-${qid}-${key}`);
+                        if (optItem) optItem.classList.add('selected');
+                        
+                        const statusEl = document.getElementById(`status-${qid}`);
+                        if (statusEl) {
+                            statusEl.innerText = 'ANSWERED';
+                            statusEl.style.color = 'var(--color-green-accent)';
+                        }
+                    });
+                }
+                if (data.remaining_seconds !== null && data.remaining_seconds !== undefined) {
+                    totalSeconds = data.remaining_seconds;
+                }
+                updateProgress();
+            } else if (data.type === 'pong') {
+                // Keep-alive heartbeat
+            }
+        };
+
+        function showAdminNotice(msg) {
+            const notice = document.createElement('div');
+            notice.className = 'admin-popup-notice';
+            notice.innerHTML = `
+                <div class="notice-content">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>${msg}</span>
+                </div>
+            `;
+            document.body.appendChild(notice);
+            setTimeout(() => {
+                notice.style.opacity = '0';
+                setTimeout(() => notice.remove(), 550);
+            }, 5000);
+        }
+
+        ws.onclose = () => {
+            console.warn('WebSocket disconnected. Attempting to save via fallback...');
+        };
+
+        // Backup interval – send full state every 30 seconds
+        const backupInterval = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'backup',
+                    answers: answers,
+                    remaining_seconds: totalSeconds
+                }));
+            }
+        }, 30000);
+
+        // Observer for Scroll-Spy
+        const observerOptions = {
+            root: document.getElementById('questions-area'),
+            threshold: 0.5,
+            rootMargin: '-10% 0% -40% 0%'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const qid = entry.target.dataset.qid;
+                if (entry.isIntersecting) {
+                    highlightInPalette(qid);
+                    entry.target.classList.add('focusing');
+                } else {
+                    entry.target.classList.remove('focusing');
+                }
+            });
+        }, observerOptions);
+
+        function setupObserver() {
+            document.querySelectorAll('.question-block').forEach(q => observer.observe(q));
+        }
+
+        function highlightInPalette(qid) {
+            document.querySelectorAll('.palette-item').forEach(item => item.classList.remove('focusing'));
+            const palItem = document.getElementById(`pal-${qid}`);
+            if (palItem) {
+                palItem.classList.add('focusing');
+                // Ensure palette item is visible
+                palItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function switchSection(name) {
+            currentSection = name;
+            document.querySelectorAll('.section-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab-${name}`).classList.add('active');
+            
+            document.querySelectorAll('.section-content').forEach(content => content.style.display = 'none');
+            document.getElementById(`sec-${name}`).style.display = 'block';
+            
+            document.querySelectorAll('.palette-grid').forEach(grid => grid.style.display = 'none');
+            document.getElementById(`palette-${name}`).style.display = 'grid';
+            
+            document.getElementById('questions-area').scrollTop = 0;
+            updateProgress();
+        }
+
+        function scrollToQuestion(qid) {
+            const el = document.getElementById(`q-${qid}`);
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function selectOption(qid, key) {
+            const qBlock = document.getElementById(`q-${qid}`);
+            qBlock.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById(`opt-${qid}-${key}`).classList.add('selected');
+            
+            answers[qid] = key;
+            document.getElementById(`pal-${qid}`).classList.add('answered');
+            document.getElementById(`status-${qid}`).innerText = 'ANSWERED';
+            document.getElementById(`status-${qid}`).style.color = 'var(--color-green-accent)';
+            
+            // Send answer instantly via WebSocket
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'answer',
+                    question_id: qid,
+                    answer: key
+                }));
+            } else {
+                // Fallback to fetch if WebSocket is down
+                fetch('/student/save-answer', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ question_id: qid, answer: key })
+                });
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let total = 0;
+            let answered = 0;
+            sectionsData.forEach(s => {
+                total += s.questions.length;
+                s.questions.forEach(q => {
+                    if (answers[q.id]) answered++;
+                });
+            });
+            const percent = total > 0 ? Math.round((answered / total) * 100) : 0;
+            document.getElementById('progress-fill').style.width = percent + '%';
+            document.getElementById('progress-text').innerText = percent + '%';
+        }
+
+        let isSubmitting = false;
+
+        function showCustomModal(title, body, confirmText, callback) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerText = body;
+            const confirmBtn = document.getElementById('modalConfirm');
+            confirmBtn.innerText = confirmText;
+            
+            modal.classList.add('active');
+            
+            const handleConfirm = () => {
+                modal.classList.remove('active');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                callback(true);
+            };
+            
+            const handleCancel = () => {
+                modal.classList.remove('active');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                callback(false);
+            };
+            
+            confirmBtn.addEventListener('click', handleConfirm);
+            document.getElementById('modalCancel').onclick = handleCancel;
+        }
+
+        function confirmFinish() {
+            showCustomModal(
+                "Final Submission", 
+                "Are you sure you want to submit your exam? You cannot change your answers after submission.",
+                "Yes, Submit Exam",
+                (confirmed) => {
+                    if (confirmed) {
+                        isSubmitting = true;
+                        finishExam();
+                    }
+                }
+            );
+        }
+
+        async function finishExam() {
+            try {
+                // Final state sync
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'backup',
+                        answers: answers,
+                        remaining_seconds: totalSeconds
+                    }));
+                }
+                await fetch('/student/finish-exam', { method: 'POST' });
+                window.location.href = "/student/results";
+            } catch (error) {
+                console.error('Error finishing exam:', error);
+                window.location.href = "/student/results";
+            }
+        }
+
+        // Timer Logic
+        const timerInterval = setInterval(function() {
+            totalSeconds--;
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                isSubmitting = true;
+                showCustomModal(
+                    "Time's Up!",
+                    "Your exam time has expired. Your responses are being submitted automatically.",
+                    "View Results",
+                    () => finishExam()
+                );
+            } else {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                const timerEl = document.getElementById('exam-timer');
+                const timerBox = document.querySelector('.timer-box');
+                const initialSeconds = {{ config.total_time_minutes }} * 60;
+                const ratio = totalSeconds / initialSeconds;
+
+                if (ratio > 0.5) {
+                    timerEl.style.color = '#10b981'; // Green
+                    timerBox.style.borderColor = '#d1fae5';
+                } else if (ratio > 0.2) {
+                    timerEl.style.color = '#f59e0b'; // Amber
+                    timerBox.style.borderColor = '#fef3c7';
+                } else {
+                    timerEl.style.color = '#ef4444'; // Red
+                    timerBox.style.borderColor = '#fee2e2';
+                }
+
+                timerEl.innerHTML = 
+                    (hours < 10 ? "0" + hours : hours) + ":" + 
+                    (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                    (seconds < 10 ? "0" + seconds : seconds);
+            }
+        }, 1000);
+
+        setupObserver();
+        updateProgress();
+
+        // Enforced Full-Screen Logic
+        if (ENFORCE_FULLSCREEN) {
+            document.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    enterFullScreen();
+                }
+            }, { once: true });
+
+            document.addEventListener('fullscreenchange', handleFullScreenExit);
+        }
+
+        function enterFullScreen() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            else if (el.msRequestFullscreen) el.msRequestFullscreen();
+        }        async function handleFullScreenExit() {
+            if (!document.fullscreenElement && !isSubmitting) {
+                violations++;
+                enterFullScreen(); // Force re-entry
+                
+                await logViolation("fullscreen_exit", "Exited full-screen mode");
+                
+                showAdminNotice(`SECURITY ALERT: Full-screen exit detected! Violation ${violations}/${MAX_VIOLATIONS+1}`);
+                
+                if (violations > MAX_VIOLATIONS) {
+                    showCustomModal("Exam Terminated", "Maximum security violations reached. Submitting automatically.", "OK", () => finishExam());
+                } else {
+                    showCustomModal(
+                        "Security Warning!",
+                        `You exited full-screen mode. This is NOT allowed. You have ${MAX_VIOLATIONS - violations + 1} more attempt(s) before automatic disqualification.`,
+                        "Return to Full-Screen",
+                        () => enterFullScreen()
+                    );
+                }
+            }
+        }
+
+        // Prevent back navigation
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        // Warn before leaving the page (Suppress if submitting)
+        window.onbeforeunload = function(e) {
+            if (isSubmitting) return;
+            e.preventDefault();
+            e.returnValue = ''; // Setting this triggers the browser's default prompt
+        };
+
+    </script>
+</body>
+</html>

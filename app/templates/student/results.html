@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results - {{ student.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .result-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 10px solid var(--color-blue-accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .score-val {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--color-dark-bg);
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .section-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .section-table th {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .section-table td {
+            padding: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .percent-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .chart-legend {
+            margin-top: 25px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .legend-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+
+        .legend-stat-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-correct { background-color: var(--color-green-accent); }
+        .dot-incorrect { background-color: #ef4444; }
+        .dot-unattended { background-color: #f59e0b; }
+    </style>
+</head>
+
+<body style="background-color: var(--color-white-off);">
+
+    <div class="college-header-wrapper">
+        <div class="college-header">
+            <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
+            <div class="header-text-container">
+                <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                <div class="header-separator"></div>
+                <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 32px; color: var(--color-dark-bg); margin-bottom: 10px;">Examination Completed!</h1>
+            <p style="color: #666; font-size: 18px;">Well done, <strong>{{ student.name }}</strong> ({{ student.college
+                }})</p>
+        </div>
+
+        <div class="summary-card">
+            <div>
+                <h2 style="margin-top: 0; display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-solid fa-chart-line" style="color: var(--color-blue-accent);"></i> Performance Overview
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 15px;">
+                        <span style="display: block; font-size: 13px; color: #666; text-transform: uppercase;">Overall
+                            Percentage</span>
+                        <span style="font-size: 32px; font-weight: 800; color: var(--color-blue-accent);">{{
+                            overall_percent }}%</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 15px;">
+                        <span style="display: block; font-size: 13px; color: #666; text-transform: uppercase;">Correct
+                            Answers</span>
+                        <span style="font-size: 32px; font-weight: 800; color: var(--color-green-accent);">{{
+                            total_correct }} / {{ total_questions }}</span>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; line-height: 1.6; color: #555;">
+                    Your performance reflects your hard work and dedication. Keep striving for excellence!
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <canvas id="scoreChart" width="220" height="220"></canvas>
+                <div class="chart-legend">
+                    <div class="legend-stat-row" style="border-left-color: var(--color-green-accent);">
+                        <div class="legend-stat-label">
+                            <div class="status-dot dot-correct"></div>
+                            <span>Correct</span>
+                        </div>
+                        <strong style="color: var(--color-green-accent);">{{ total_correct }}</strong>
+                    </div>
+                    <div class="legend-stat-row" style="border-left-color: #ef4444;">
+                        <div class="legend-stat-label">
+                            <div class="status-dot dot-incorrect"></div>
+                            <span>Incorrect</span>
+                        </div>
+                        <strong style="color: #ef4444;">{{ total_incorrect }}</strong>
+                    </div>
+                    <div class="legend-stat-row" style="border-left-color: #f59e0b;">
+                        <div class="legend-stat-label">
+                            <div class="status-dot dot-unattended"></div>
+                            <span>Unattended</span>
+                        </div>
+                        <strong style="color: #f59e0b;">{{ total_unattended }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: var(--color-dark-bg);">Section-wise Breakdown</h2>
+            <div class="top-stat-legend" style="display: flex; gap: 15px; font-size: 13px; font-weight: 700; background: white; padding: 10px 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <span style="color: var(--color-green-accent);"><i class="fa-solid fa-circle-check"></i> Correct: {{ total_correct }}</span>
+                <span style="color: #ef4444; margin-left: 10px;"><i class="fa-solid fa-circle-xmark"></i> Incorrect: {{ total_incorrect }}</span>
+                <span style="color: #f59e0b; margin-left: 10px;"><i class="fa-solid fa-circle-minus"></i> Unattended: {{ total_unattended }}</span>
+            </div>
+        </div>
+        <table class="section-table">
+            <thead>
+                <tr>
+                    <th>Section Name</th>
+                    <th>Score</th>
+                    <th>Accuracy</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in results %}
+                <tr>
+                    <td style="font-weight: 600;">{{ res.name }}</td>
+                    <td>{{ res.correct }} / {{ res.total }}</td>
+                    <td style="font-weight: 700;">{{ res.percentage }}%</td>
+                    <td>
+                        {% if res.percentage >= 75 %}
+                        <span class="percent-pill" style="background: #dcfce7; color: #166534;">Excellent</span>
+                        {% elif res.percentage >= 50 %}
+                        <span class="percent-pill" style="background: #fef9c3; color: #854d0e;">Good</span>
+                        {% else %}
+                        <span class="percent-pill" style="background: #fee2e2; color: #991b1b;">Needs Focus</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <script>
+        // Force replace history state to lock the user on the results page
+        (function() {
+            // Replace the current history entry (which might be the exam page if they just arrived)
+            window.history.replaceState(null, null, window.location.href);
+            
+            // Push an additional state and handle popstate to prevent back navigation
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+            };
+        })();
+
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        const scoreChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct', 'Incorrect', 'Unattended'],
+                datasets: [{
+                    data: [{{ total_correct }}, {{ total_incorrect }}, {{ total_unattended }}],
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                    borderWidth: 0,
+                    hoverOffset: 15
+                }]
+            },
+        options: {
+            cutout: '70%',
+                plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+        });
+    </script>
+
+</body>
+
+</html>
