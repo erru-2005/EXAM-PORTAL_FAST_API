@@ -315,6 +315,7 @@
                 transform: translate(0, 0) scale(1);
                 opacity: 1;
             }
+
             100% {
                 transform: translate(var(--tx), var(--ty)) scale(0);
                 opacity: 0;
@@ -437,47 +438,106 @@
         </div>
     </div>
 
+    <!-- Start Exam Countdown Overlay (Glassmorphism Style) -->
+    <div class="modal-overlay active" id="startCountdownOverlay"
+        style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 5000;">
+        <div class="modal-card"
+            style="max-width: 420px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.95); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-radius: 24px;">
+            <div class="modal-icon" style="color: var(--color-blue-accent); font-size: 3.5rem; margin-bottom: 15px;"><i
+                    class="fa-solid fa-expand"></i></div>
+            <div class="modal-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">
+                Security Initialization</div>
+            <div class="modal-body" style="font-weight: 500; font-family: 'Outfit', sans-serif;">
+                <p style="margin-bottom: 15px; font-size: 15px; color: #475569; line-height: 1.5;">The system is
+                    preparing a secure environment. The screen will automatically transition to <strong>Full-Screen
+                        Mode</strong>.</p>
+
+                <div
+                    style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin: 20px 0;">
+                    <p
+                        style="margin: 0; font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                        Wait for:</p>
+                    <div id="initial-countdown-timer"
+                        style="font-size: 52px; font-weight: 900; color: var(--color-blue-accent); line-height: 1;">{{ config.get('countdown_before_exam', 30) }}s</div>
+                </div>
+
+                <div
+                    style="display: flex; align-items: center; gap: 10px; color: #ef4444; background: #fff1f2; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: left; margin-bottom: 20px;">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 16px;"></i>
+                    <span>Do not attempt to exit full-screen or refresh the page.</span>
+                </div>
+
+                <p
+                    style="color: #0f172a; font-weight: 800; font-size: 18px; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    ALL THE BEST FOR YOUR EXAM!</p>
+            </div>
+
+            <div id="ready-btn-container" style="display: none; margin-top: 10px; animation: slideUp 0.4s ease-out;">
+                <button class="btn-primary" id="readyToStartBtn"
+                    style="width: 100%; font-size: 18px; padding: 18px; border-radius: 14px; background: #0f172a; color: white; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.4); letter-spacing: 0.5px;">
+                    READY TO START <i class="fa-solid fa-play"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Announcement Toast -->
-    <div id="adminToast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); z-index: 9999; background: #1e293b; color: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; min-width: 400px; max-width: 600px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; pointer-events: none; border-left: 6px solid #3b82f6;">
+    <div id="adminToast"
+        style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); z-index: 9999; background: #1e293b; color: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; min-width: 400px; max-width: 600px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; pointer-events: none; border-left: 6px solid #3b82f6;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 12px; color: #3b82f6; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+            <div
+                style="display: flex; align-items: center; gap: 12px; color: #3b82f6; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Message from Admin</span>
             </div>
-            <button onclick="hideAdminToast()" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 0;"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="hideAdminToast()"
+                style="background: none; border: none; color: #64748b; cursor: pointer; padding: 0;"><i
+                    class="fa-solid fa-xmark"></i></button>
         </div>
         <div style="display: flex; align-items: flex-start; gap: 10px; padding-left: 2px;">
             <strong style="color: #94a3b8; font-size: 15px; white-space: nowrap;">Admin:</strong>
-            <p id="adminToastText" style="margin: 0; font-size: 16px; line-height: 1.5; color: #f8fafc; font-weight: 500;"></p>
+            <p id="adminToastText"
+                style="margin: 0; font-size: 16px; line-height: 1.5; color: #f8fafc; font-weight: 500;"></p>
         </div>
-        <div id="toastTimer" style="position: absolute; bottom: 0; left: 0; height: 3px; background: #3b82f6; width: 100%; transition: width linear;"></div>
+        <div id="toastTimer"
+            style="position: absolute; bottom: 0; left: 0; height: 3px; background: #3b82f6; width: 100%; transition: width linear;">
+        </div>
     </div>
 
     <div class="page-wrapper">
         <div class="college-header-wrapper">
-            <div class="college-header" style="display: flex; justify-content: flex-start; align-items: center; padding: 12px 30px;">
+            <div class="college-header"
+                style="display: flex; justify-content: flex-start; align-items: center; padding: 4px 30px;">
                 <div style="display: flex; align-items: center; gap: 20px;">
-                    <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo" style="height: 70px;">
+                    <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo" style="height: 85px;">
                     <div class="header-text-container" style="text-align: left;">
-                        <h1 class="college-title" style="margin: 0; font-size: 24px; color: #7c0000; font-weight: 800;">Dr. B. B. Hegde First Grade College, Kundapura</h1>
-                        <div class="header-separator" style="width: 100%; border-bottom: 2px solid #1e293b; margin: 5px 0;"></div>
-                        <p class="header-subtext" style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">A Unit of Coondapur Education Society(R)</p>
+                        <h1 class="college-title" style="margin: 0; font-size: 28px; color: #7c0000; font-weight: 800;">
+                            Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                        <div class="header-separator"
+                            style="width: 100%; border-bottom: 2px solid #1e293b; margin: 3px 0;"></div>
+                        <p class="header-subtext" style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">
+                            A Unit of Coondapur Education Society(R)</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Candidate Info Bar -->
-        <div class="candidate-info-bar" style="background: white; border-bottom: 2px solid #e2e8f0; padding: 12px 30px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <div class="candidate-info-bar"
+            style="background: white; border-bottom: 2px solid #e2e8f0; padding: 12px 30px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: flex-start; gap: 40px; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANDIDATE:</span>
-                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{ student.name.lower() }}</span>
+                    <span
+                        style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANDIDATE:</span>
+                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{
+                        student.name.lower() }}</span>
                 </div>
                 <div style="width: 2px; height: 20px; background: #e2e8f0;"></div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLLEGE:</span>
-                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{ student.college.lower() }}</span>
+                    <span
+                        style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLLEGE:</span>
+                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{
+                        student.college.lower() }}</span>
                 </div>
             </div>
         </div>
@@ -551,7 +611,8 @@
                                     style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 16px 40px; border-radius: 15px; font-size: 19px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 auto;">
                                     Final Submission <i class="fa-solid fa-paper-plane" style="font-size: 20px;"></i>
                                 </button>
-                                <div id="paperBurst" style="position: absolute; top:50%; left:50%; pointer-events: none;"></div>
+                                <div id="paperBurst"
+                                    style="position: absolute; top:50%; left:50%; pointer-events: none;"></div>
                             </div>
                             {% endif %}
                         </div>
@@ -624,7 +685,7 @@
         const answerserver = {{ answers | tojson }};
         let currentSection = sectionsData[0].name;
         let answers = answerserver || {};
-        
+
         // Helper to read cookie
         function getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -640,7 +701,7 @@
         let serverRemaining = {{ remaining_seconds }};
         let localRemaining = localStorage.getItem(LOCAL_TIME_KEY);
         let totalSeconds = serverRemaining;
-        
+
         // Prevent refresh advantage by taking the minimum available time
         if (localRemaining !== null) {
             localRemaining = parseInt(localRemaining, 10);
@@ -660,10 +721,10 @@
                 // Get existing backup data to preserve other students' data if any
                 const existing = localStorage.getItem(LOCAL_STORAGE_KEY);
                 let backupData = existing ? JSON.parse(existing) : {};
-                
+
                 // Wrap the current student's data by their mobile number
                 backupData[studentMobile] = answers;
-                
+
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(backupData));
                 console.log(`💾 Progress saved for ${studentMobile}:`, answers);
             } catch (e) {
@@ -677,7 +738,7 @@
                 if (saved) {
                     const backupData = JSON.parse(saved);
                     const localAnswers = backupData[studentMobile];
-                    
+
                     if (localAnswers) {
                         // Merge local answers into current (server) answers
                         // Server answers (answerserver) take precedence
@@ -761,7 +822,7 @@
                     ws.send(JSON.stringify({ type: 'join', mobile: mobile }));
                 }
                 reconnectInterval = 3000; // Reset backoff
-                
+
                 // Start Heartbeat to keep connection alive
                 if (heartbeatInterval) clearInterval(heartbeatInterval);
                 heartbeatInterval = setInterval(() => {
@@ -921,7 +982,7 @@
             const modal = document.getElementById('customModal');
             document.getElementById('modalTitle').innerText = title;
             const bodyEl = document.getElementById('modalBody');
-            
+
             if (isSummary) {
                 bodyEl.innerHTML = body;
                 document.getElementById('modalCard').style.maxWidth = '600px';
@@ -931,7 +992,7 @@
                 document.getElementById('modalCard').style.maxWidth = '450px';
                 document.getElementById('modalIcon').className = 'fa-solid fa-circle-question';
             }
-            
+
             const confirmBtn = document.getElementById('modalConfirm');
             confirmBtn.innerText = confirmText;
 
@@ -1028,22 +1089,22 @@
             const timerBar = document.getElementById('toastTimer');
             const duration = {{ config.get('admin_notification_duration', 5) }} * 1000;
 
-            if (toastTimeout) clearTimeout(toastTimeout);
-            
-            text.innerText = message;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            toast.style.pointerEvents = 'auto';
-            
-            // Reset and start timer bar
-            timerBar.style.transition = 'none';
-            timerBar.style.width = '100%';
-            setTimeout(() => {
-                timerBar.style.transition = `width ${duration}ms linear`;
-                timerBar.style.width = '0%';
-            }, 10);
+        if (toastTimeout) clearTimeout(toastTimeout);
 
-            toastTimeout = setTimeout(hideAdminToast, duration);
+        text.innerText = message;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+        toast.style.pointerEvents = 'auto';
+
+        // Reset and start timer bar
+        timerBar.style.transition = 'none';
+        timerBar.style.width = '100%';
+        setTimeout(() => {
+            timerBar.style.transition = `width ${duration}ms linear`;
+            timerBar.style.width = '0%';
+        }, 10);
+
+        toastTimeout = setTimeout(hideAdminToast, duration);
         }
 
         function hideAdminToast() {
@@ -1056,7 +1117,7 @@
 
         function createSparkles() {
             const paperBurstCont = document.getElementById('paperBurst');
-            if(!paperBurstCont) return;
+            if (!paperBurstCont) return;
             paperBurstCont.innerHTML = '';
             for (let i = 0; i < 60; i++) {
                 const s = document.createElement('div');
@@ -1089,7 +1150,7 @@
                     }));
                 }
                 await fetch('/student/finish-exam', { method: 'POST' });
-                
+
                 // Add a small delay so the animation can be seen
                 setTimeout(() => {
                     window.location.href = "/student/results";
@@ -1146,7 +1207,64 @@
         restoreFromLocalBackup(); // Initialize from local storage if available
         saveToLocalBackup();      // Ensure initial answers (from server) are backed up immediately
         updateProgress();
-        
+
+        // --- Start Countdown Logic with Persistence ---
+        const INITIAL_COUNTDOWN_STORAGE_KEY = `exam_initial_countdown_{{ student.mobile }}`;
+        let savedCountdown = localStorage.getItem(INITIAL_COUNTDOWN_STORAGE_KEY);
+        let initialCountdown = savedCountdown !== null ? parseInt(savedCountdown) : {{ config.get('countdown_before_exam', 30) }};
+
+        const initialTimerEl = document.getElementById('initial-countdown-timer');
+        const readyBtnCont = document.getElementById('ready-btn-container');
+        const countdownOverlay = document.getElementById('startCountdownOverlay');
+        const pageWrapper = document.querySelector('.page-wrapper');
+
+        // Initial sync of the timer display
+        if (initialTimerEl) {
+            initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
+        }
+
+        // Blur the page initially with smooth transition
+        pageWrapper.style.transition = 'filter 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        pageWrapper.style.filter = 'blur(15px) saturate(1.2)';
+        pageWrapper.style.pointerEvents = 'none';
+
+        const initialInterval = setInterval(() => {
+            initialCountdown--;
+
+            if (initialCountdown <= 0) {
+                clearInterval(initialInterval);
+                localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, "0");
+                if (initialTimerEl) {
+                    initialTimerEl.innerHTML = "00";
+                    initialTimerEl.style.color = "#10b981";
+                    initialTimerEl.parentElement.style.display = 'none'; // Hide the whole timer box
+                }
+                readyBtnCont.style.display = 'block';
+            } else {
+                localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, initialCountdown.toString());
+                if (initialTimerEl) {
+                    initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
+                }
+            }
+        }, 1000);
+
+        document.getElementById('readyToStartBtn').onclick = function () {
+            enterFullScreen();
+            countdownOverlay.style.opacity = '0';
+            countdownOverlay.style.transform = 'scale(0.9)';
+            countdownOverlay.style.transition = 'all 0.4s ease';
+
+            // Clear the initial countdown from storage as it's no longer needed
+            localStorage.removeItem(INITIAL_COUNTDOWN_STORAGE_KEY);
+
+            setTimeout(() => {
+                countdownOverlay.classList.remove('active');
+                pageWrapper.style.filter = 'none';
+                pageWrapper.style.pointerEvents = 'auto';
+            }, 400);
+        };
+        // --- End Start Countdown Logic ---
+
         console.log("🚀 Exam Initialized. Storage Key:", LOCAL_STORAGE_KEY);
         console.log("🌐 Current Origin:", window.location.origin);
 
@@ -1196,7 +1314,7 @@
         }
 
         // On window click anywhere, re-enforce full screen if it was dropped
-        window.onclick = function() {
+        window.onclick = function () {
             if (ENFORCE_FULLSCREEN && !document.fullscreenElement && !isSubmitting) {
                 enterFullScreen();
             }

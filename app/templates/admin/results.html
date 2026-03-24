@@ -70,7 +70,11 @@
                 <div class="card" style="padding: 25px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                         <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-square-poll-vertical"></i> Detailed Results Analysis</h3>
-                        <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; color: #94a3b8; font-size: 14px;"></i>
+                                <input type="text" id="searchInput" onkeyup="refreshList()" placeholder="Search Student by Name or Mobile..." style="padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; width: 300px; transition: border-color 0.2s;">
+                            </div>
                             <select id="sortDropdown" onchange="refreshList()" style="padding: 8px 15px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; color: #475569; cursor: pointer; background: white;">
                                 <option value="score">Sort by Score (High to Low)</option>
                                 <option value="name">Sort by Name (A-Z)</option>
@@ -107,10 +111,16 @@
             const res = await fetch('/administrator/students-list');
             const data = await res.json();
             const list = document.getElementById('fullResultsList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const sortBy = document.getElementById('sortDropdown').value;
             
-            // Filter completed students
-            let filteredData = data.filter(s => s.status === 'completed');
+            // Filter completed students and by search term
+            let filteredData = data.filter(s => {
+                const isCompleted = s.status === 'completed';
+                const matchesSearch = s.name.toLowerCase().includes(searchTerm) || 
+                                     s.mobile.includes(searchTerm);
+                return isCompleted && matchesSearch;
+            });
 
             // Apply sorting
             if (sortBy === 'name') {

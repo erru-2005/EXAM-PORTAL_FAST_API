@@ -58,6 +58,41 @@
             .modal-header { padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
             .modal-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
             @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+            #studentSearch:focus { 
+                border-color: #000; 
+                box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); 
+                max-width: 450px;
+            }
+
+            /* B&W Card Styles */
+            .student-card-bw { background: white; border: 1px solid #000; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+            .student-card-bw:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            .card-header-bw { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+            .student-name-wrap { font-weight: 800; font-size: 14px; color: #000; word-break: break-word; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            .student-info-small { font-size: 11px; color: #4b5563; margin-top: 2px; word-break: break-word; font-weight: 500; }
+            .online-dot { width: 8px; height: 8px; background: #000; border-radius: 50%; border: 2px solid #000; position: relative; }
+            .online-dot::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border: 1.5px solid #000; border-radius: 50%; animation: pulse-bw 2s infinite; }
+            @keyframes pulse-bw { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+            .offline-dot { width: 8px; height: 8px; background: #fff; border: 1.5px solid #9ca3af; border-radius: 50%; }
+            
+            .progress-container-bw { margin-bottom: 12px; }
+            .progress-label-bw { font-size: 10px; font-weight: 800; color: #000; margin-bottom: 4px; text-transform: uppercase; }
+            .progress-bar-bg-bw { background: #f3f4f6; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #e5e7eb; }
+            .progress-bar-fill-bw { background: #000; height: 100%; transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+            .card-stats-grid-bw { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; border-top: 1px solid #000; padding-top: 10px; }
+            .stat-item-bw { display: flex; flex-direction: column; align-items: center; }
+            .stat-label-bw { font-size: 9px; font-weight: 900; color: #6b7280; text-transform: uppercase; }
+            .stat-val-bw { font-size: 13px; font-weight: 900; color: #000; font-family: 'Outfit', sans-serif; }
+            .text-danger-bw { color: #cc0000; }
+
+            .card-footer-bw { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px; border-top: 1px dashed #000; }
+            .status-pill-completed { background: #000; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; }
+            .status-pill-active { background: #fff; color: #000; border: 1.5px solid #000; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; }
+            
+            .card-footer-bw button { background: none; border: none; font-size: 14px; cursor: pointer; color: #000; padding: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; }
+            .card-footer-bw button:hover:not(:disabled) { background: #000; color: #fff; }
         </style>
 
         <div class="main-wrapper">
@@ -85,33 +120,30 @@
                 </div>
 
                 <div class="card" style="padding: 25px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                        <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-users-viewfinder"></i> Live Student Monitoring</h3>
-                        <div style="display: flex; gap: 10px;">
-                            <select id="sortAlpha" onchange="refreshList()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd;">
-                                <option value="az">Name (A-Z)</option>
-                                <option value="za">Name (Z-A)</option>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; flex-wrap: wrap;">
+                        <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg); white-space: nowrap;"><i class="fa-solid fa-users-viewfinder"></i> Live Student Monitoring</h3>
+                        
+                        <div style="display: flex; gap: 10px; flex: 1; justify-content: flex-end; align-items: center;">
+                            <div style="position: relative; flex: 1; max-width: 400px;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 14px;"></i>
+                                <input type="text" id="studentSearch" placeholder="Search by name, mobile, or parent..." 
+                                    onkeyup="filterList()" 
+                                    style="width: 100%; padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: all 0.2s;">
+                            </div>
+
+                             <select id="sortAlpha" onchange="refreshList()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-size: 14px; cursor: pointer;">
+                                <option value="name_asc">Name (A-Z)</option>
+                                <option value="name_desc">Name (Z-A)</option>
+                                <option value="score_desc">Marks (High-Low)</option>
+                                <option value="score_asc">Marks (Low-High)</option>
+                                <option value="violations">Most Violations</option>
                             </select>
-                            <button onclick="refreshList()" class="admin-btn-secondary"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            <button onclick="refreshList()" class="admin-btn-secondary" style="padding: 8px 15px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-rotate"></i> Refresh</button>
                         </div>
                     </div>
                     
-                    <div style="overflow-x: auto;">
-                        <table class="admin-table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="width: 200px;">Student Details</th>
-                                    <th>Online</th>
-                                    <th>Status</th>
-                                    <th>Violations</th>
-                                    <th>Time</th>
-                                    <th>Overall</th>
-                                    <th style="width: 300px;">Sectional Analysis</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fullStudentList"></tbody>
-                        </table>
+                    <div id="studentCardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                        <!-- Populated via JS -->
                     </div>
                 </div>
             </div>
@@ -163,54 +195,96 @@
     </div>
 
     <script>
+        let studentsData = [];
         let currentTargetMobile = null;
 
         async function refreshList() {
             const res = await fetch('/administrator/students-list');
-            let data = await res.json();
-            
-            const sortVal = document.getElementById('sortAlpha').value;
-            data.sort((a,b) => {
-                if(sortVal === 'az') return a.name.localeCompare(b.name);
-                return b.name.localeCompare(a.name);
-            });
+            studentsData = await res.json();
+            filterList(); // This will apply both sorting and searching
+        }
 
-            const list = document.getElementById('fullStudentList');
+        function filterList() {
+            const sortVal = document.getElementById('sortAlpha').value;
+            const searchVal = document.getElementById('studentSearch').value.toLowerCase();
+            
+            let filtered = [...studentsData];
+
+            // 1. Filter by Search Query
+            if (searchVal) {
+                filtered = filtered.filter(s => 
+                    (s.name && s.name.toLowerCase().includes(searchVal)) ||
+                    (s.mobile && s.mobile.includes(searchVal)) ||
+                    (s.parent_name && s.parent_name.toLowerCase().includes(searchVal)) ||
+                    (s.status && s.status.toLowerCase().includes(searchVal)) ||
+                    (s.stream && s.stream.toLowerCase().includes(searchVal)) ||
+                    (s.address && s.address.toLowerCase().includes(searchVal))
+                );
+            }
+
+            // 2. Sort the Data
+            if (sortVal === 'name_asc') filtered.sort((a,b) => a.name.localeCompare(b.name));
+            else if (sortVal === 'name_desc') filtered.sort((a,b) => b.name.localeCompare(a.name));
+            else if (sortVal === 'score_desc') filtered.sort((a,b) => b.total_score - a.total_score);
+            else if (sortVal === 'score_asc') filtered.sort((a,b) => a.total_score - b.total_score);
+            else if (sortVal === 'violations') filtered.sort((a,b) => b.violation_count - a.violation_count);
+
+            renderData(filtered);
+        }
+
+        function renderData(data) {
+            const list = document.getElementById('studentCardsGrid');
+            if (data.length === 0) {
+                list.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">No matching records found.</div>';
+                return;
+            }
+
             list.innerHTML = data.map(s => {
-                const sectional = Object.entries(s.section_wise).map(([name, score]) => `<div class="sec-item">${name}: <strong>${score}</strong></div>`).join('');
-                
-                let rowClass = 'row-low';
-                if(s.total_score >= 5) rowClass = 'row-high';
-                else if(s.total_score >= 3) rowClass = 'row-med';
+                const progress = (s.answered_count / (s.total_questions || 1)) * 100;
+                const onlineStatus = s.is_online ? 'online-dot' : 'offline-dot';
+                const statusClass = s.status === 'completed' ? 'status-pill-completed' : 'status-pill-active';
 
                 return `
-                    <tr class="${rowClass}">
-                        <td>
-                            <strong style="font-size:15px">${s.name}</strong><br>
-                            <small>${s.mobile}</small><br>
-                            <small style="opacity:0.8">P: ${s.parent_name || 'N/A'}</small>
-                        </td>
-                        <td>
-                            <span style="height:10px; width:10px; background:${s.is_online ? '#10b981' : '#cbd5e1'}; border-radius:50%; display:inline-block; margin-right:5px;"></span>
-                            <span style="font-weight:600;">${s.is_online ? 'LIVE' : 'OFFLINE'}</span>
-                        </td>
-                        <td><span class="status-pill status-${s.status}">${s.status.toUpperCase()}</span></td>
-                        <td><span class="violation-badge ${s.violation_count > 0 ? 'bg-red' : ''}">${s.violation_count}</span></td>
-                        <td><strong style="font-family: monospace;">${s.time_remaining}</strong></td>
-                        <td style="text-align:center"><strong style="font-size:1.4em">${s.total_score}</strong></td>
-                        <td><div class="sec-grid">${sectional}</div></td>
-                        <td>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <button onclick="openMessageModal('${s.mobile}', '${s.name}')" class="admin-btn-secondary" style="font-size:11px; padding: 4px;" ${!s.is_online ? 'disabled style="opacity:0.3"' : ''}>
-                                    <i class="fa-solid fa-message"></i> MSG
-                                </button>
-                                <div style="display:flex; gap:5px;">
-                                    <button onclick="viewAnswers('${s.mobile}', '${s.name}')" class="admin-btn-secondary" style="font-size:11px; padding: 4px; flex:1;"><i class="fa-solid fa-eye"></i> VIEW</button>
-                                    <button onclick="viewSecurityLogs('${s.mobile}', '${s.name}')" class="admin-btn-secondary" style="font-size:11px; padding: 4px; flex:1; color:#ef4444;"><i class="fa-solid fa-shield-halved"></i> LOGS</button>
-                                </div>
+                    <div class="student-card-bw">
+                        <div class="card-header-bw">
+                            <div style="flex: 1; overflow: hidden;">
+                                <div class="student-name-wrap" title="${s.name}">${s.name}</div>
+                                <div class="student-info-small">${s.mobile} | ${s.college || 'No College'}</div>
                             </div>
-                        </td>
-                    </tr>
+                            <div class="${onlineStatus}"></div>
+                        </div>
+
+                        <div class="progress-container-bw">
+                            <div class="progress-label-bw">Progress: ${s.answered_count}/${s.total_questions}</div>
+                            <div class="progress-bar-bg-bw">
+                                <div class="progress-bar-fill-bw" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="card-stats-grid-bw">
+                            <div class="stat-item-bw">
+                                <span class="stat-label-bw">SCORE</span>
+                                <span class="stat-val-bw">${s.total_score}</span>
+                            </div>
+                            <div class="stat-item-bw">
+                                <span class="stat-label-bw">VIOLATIONS</span>
+                                <span class="stat-val-bw ${s.violation_count > 0 ? 'text-danger-bw' : ''}">${s.violation_count}</span>
+                            </div>
+                            <div class="stat-item-bw">
+                                <span class="stat-label-bw">TIME</span>
+                                <span class="stat-val-bw">${s.time_remaining || '00:00'}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer-bw">
+                            <span class="${statusClass}">${s.status.toUpperCase()}</span>
+                            <div style="display:flex; gap: 8px;">
+                                <button onclick="viewAnswers('${s.mobile}', '${s.name}')" title="View Progress"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="viewSecurityLogs('${s.mobile}', '${s.name}')" title="Security Logs" style="color: #6b7280;"><i class="fa-solid fa-shield-halved"></i></button>
+                                <button onclick="openMessageModal('${s.mobile}', '${s.name}')" title="Message" ${!s.is_online ? 'disabled style="opacity:0.3"' : ''}><i class="fa-solid fa-message"></i></button>
+                            </div>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }

@@ -33,19 +33,45 @@ async def broadcast_admin_stats(mobile: str | None = None, is_online: bool | Non
     total_enrollments = await db["students"].count_documents({})
     completed_exams = await db["students"].count_documents({"status": "completed"})
     
+    pending_exams = total_enrollments - completed_exams
+    
     msg = {
         "type": "stats",
         "active_now": active_now,
         "total_enrollments": total_enrollments,
-        "completed_exams": completed_exams
+        "completed_exams": completed_exams,
+        "pending_exams": pending_exams
     }
     
-    # If a specific student's status changed, include that in the broadcast
+    # If a specific student's status changed, include full enriched data in the broadcast
     if mobile is not None:
-        msg["status_update"] = {
-            "mobile": mobile,
-            "is_online": is_online
-        }
+        student = await db["students"].find_one({"mobile": mobile})
+        if student:
+            from app.utils.excel_utils import parse_exam_questions
+            exam_data = parse_exam_questions("app/Questions/exam_questions.xlsx")
+            
+            # Enrich
+            student["_id"] = str(student["_id"])
+            total_correct = 0
+            answered_count = len(student.get("answers", {}))
+            for section in exam_data["sections"]:
+                for q in section["questions"]:
+                    if student.get("answers", {}).get(q["id"]) == q["correct"]:
+                        total_correct += 1
+            
+            student["total_questions"] = exam_data["total_questions"]
+            student["answered_count"] = answered_count
+            student["correct_count"] = total_correct
+            student["incorrect_count"] = answered_count - total_correct
+            student["unattended_count"] = student["total_questions"] - answered_count
+            student["total_score"] = total_correct
+            student["is_online"] = is_online if is_online is not None else (mobile in active_connections)
+            
+            rem = student.get("remaining_seconds", 3600)
+            mins, secs = divmod(int(rem), 60)
+            student["time_remaining"] = f"{mins:02d}:{secs:02d}"
+            
+            msg["student_update"] = student
     
     for conn in admin_connections:
         try:
@@ -53,6 +79,47 @@ async def broadcast_admin_stats(mobile: str | None = None, is_online: bool | Non
         except:
             if conn in admin_connections:
                 admin_connections.remove(conn)
+
+@router.get("/students-list")
+async def get_students_list(request: Request):
+    if request.cookies.get("admin_session") != "authenticated":
+        raise HTTPException(status_code=401)
+    
+    db = await get_database()
+    students = await db["students"].find().to_list(length=1000)
+    
+    from app.utils.excel_utils import parse_exam_questions
+    exam_data = parse_exam_questions("app/Questions/exam_questions.xlsx")
+    
+    for s in students:
+        s["_id"] = str(s["_id"])
+        total_correct = 0
+        section_scores = {}
+        for section in exam_data["sections"]:
+            sec_correct = 0
+            for q in section["questions"]:
+                if s.get("answers", {}).get(q["id"]) == q["correct"]:
+                    sec_correct += 1
+                    total_correct += 1
+            section_scores[section["name"]] = sec_correct
+        
+        answered_count = len(s.get("answers", {}))
+        s["total_score"] = total_correct
+        s["section_wise"] = section_scores
+        s["violation_count"] = s.get("violation_count", 0)
+        s["is_online"] = s["mobile"] in active_connections
+        s["total_questions"] = exam_data["total_questions"]
+        s["answered_count"] = answered_count
+        s["correct_count"] = total_correct
+        s["incorrect_count"] = answered_count - total_correct
+        s["unattended_count"] = s["total_questions"] - answered_count
+        
+        rem = s.get("remaining_seconds", 3600)
+        mins, secs = divmod(int(rem), 60)
+        s["time_remaining"] = f"{mins:02d}:{secs:02d}"
+        s["completed_at"] = s.get("completed_at").isoformat() if s.get("completed_at") else None
+        
+    return students
 
 @router.websocket("/admin-ws")
 async def admin_websocket_endpoint(websocket: WebSocket):
@@ -65,11 +132,14 @@ async def admin_websocket_endpoint(websocket: WebSocket):
         total_enrollments = await db["students"].count_documents({})
         completed_exams = await db["students"].count_documents({"status": "completed"})
         
+        pending_exams = total_enrollments - completed_exams
+        
         await websocket.send_json({
             "type": "stats", 
             "active_now": active_now,
             "total_enrollments": total_enrollments,
-            "completed_exams": completed_exams
+            "completed_exams": completed_exams,
+            "pending_exams": pending_exams
         })
         while True:
             await websocket.receive_text()
@@ -108,6 +178,7 @@ async def admin_dashboard(request: Request):
     total_students = await db["students"].count_documents({})
     active_now = len(active_connections)
     completed_students = await db["students"].count_documents({"status": "completed"})
+    pending_students = total_students - completed_students
     config = get_portal_config()
     
     return templates.TemplateResponse(
@@ -117,6 +188,7 @@ async def admin_dashboard(request: Request):
             "total_students": total_students,
             "active_now": active_now,
             "completed_students": completed_students,
+            "pending_students": pending_students,
             "config": config
         }
     )
@@ -206,7 +278,9 @@ async def save_exam_config(
     real_time_backup: str = Form(None),
     allow_copy: str = Form(None),
     show_results: str = Form(None),
-    admin_notification_duration: int = Form(5)
+    admin_notification_duration: int = Form(5),
+    countdown_before_exam: int = Form(30),
+    show_animations: str = Form(None)
 ):
     if request.cookies.get("admin_session") != "authenticated":
         return RedirectResponse(url="/administrator/")
@@ -224,7 +298,9 @@ async def save_exam_config(
         "real_time_backup": real_time_backup == "on",
         "allow_copy": allow_copy == "on",
         "show_results": show_results == "on" if show_results else (show_results == "on" if request.method == "POST" else config.get('show_results', True)),
-        "admin_notification_duration": admin_notification_duration
+        "admin_notification_duration": admin_notification_duration,
+        "countdown_before_exam": countdown_before_exam,
+        "show_login_animations": show_animations == "on"
     })
     
     save_portal_config(config)
@@ -294,41 +370,7 @@ async def get_results_page(request: Request):
         "completed_students": completed_students
     })
 
-@router.get("/students-list")
-async def get_students_list(request: Request):
-    if request.cookies.get("admin_session") != "authenticated":
-        raise HTTPException(status_code=401)
-    
-    db = await get_database()
-    students = await db["students"].find().to_list(length=1000)
-    
-    # Enrich student data with score and metadata
-    from app.utils.excel_utils import parse_exam_questions
-    exam_data = parse_exam_questions("app/Questions/exam_questions.xlsx")
-    
-    for s in students:
-        s["_id"] = str(s["_id"])
-        total_correct = 0
-        section_scores = {}
-        for section in exam_data["sections"]:
-            sec_correct = 0
-            for q in section["questions"]:
-                if s.get("answers", {}).get(q["id"]) == q["correct"]:
-                    sec_correct += 1
-                    total_correct += 1
-            section_scores[section["name"]] = sec_correct
-        
-        s["total_score"] = total_correct
-        s["section_wise"] = section_scores
-        s["violation_count"] = s.get("violation_count", 0)
-        s["is_online"] = s["mobile"] in active_connections
-        rem = s.get("remaining_seconds", 3600)  # Default hour
-        mins, secs = divmod(int(rem), 60)
-        s["time_remaining"] = f"{mins:02d}:{secs:02d}"
-        s["completed_at"] = s.get("completed_at").isoformat() if s.get("completed_at") else None
-        s["last_active"] = s.get("created_at").isoformat() if s.get("created_at") else None
-        
-    return students
+
 
 @router.post("/send-message")
 async def send_student_message(request: Request):

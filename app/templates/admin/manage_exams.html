@@ -103,7 +103,19 @@
 
                         <label style="display: block; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #64748b; margin-bottom: 15px;">Security & Oversight Toggles</label>
                         
-                        <!-- Inspect Allow Toggle -->
+                        <!-- Login Page Animations Toggle -->
+                        <div class="form-row">
+                            <div class="form-label-group">
+                                <label>Login Page Animations</label>
+                                <p>Enable complex circuit animations and pulsing glows on the student login screen.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="show_animations" {% if config.show_login_animations %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Direct Inspect Allow Toggle -->
                         <div class="form-row">
                             <div class="form-label-group">
                                 <label>Direct Inspection Mode</label>
@@ -145,6 +157,15 @@
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <input type="number" name="admin_notification_duration" value="{{ config.get('admin_notification_duration', 5) }}" min="2" max="30" class="input-small-pill">
+                                </div>
+                            </div>
+                            <div class="form-row" style="background-color: #f0f9ff; border-color: #bae6fd; margin-bottom: 0;">
+                                <div class="form-label-group">
+                                    <label>Initial Countdown (Seconds)</label>
+                                    <p>Countdown time before exam starts on MCQ page.</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="number" name="countdown_before_exam" value="{{ config.get('countdown_before_exam', 30) }}" min="5" max="300" class="input-small-pill">
                                 </div>
                             </div>
                         </div>
