@@ -686,19 +686,19 @@ async def export_results_pdf(request: Request):
             textColor=colors.HexColor("#800000"), # Professional Dark Brown
             fontName='Helvetica-Bold',
             alignment=TA_LEFT,
-            leading=32, # Increased from 28
-            spaceAfter=4
+            leading=26, # Reduced from 35
+            spaceAfter=6
         )
         
         college_subtitle_style = ParagraphStyle(
             'CollegeSubtitle',
             parent=styles['Normal'],
-            fontSize=11,
+            fontSize=12,
             textColor=colors.black,
-            fontName='Helvetica',
+            fontName='Helvetica-Bold', # Match the bolder look in screenshot
             alignment=TA_LEFT,
-            leading=18, # Increased from 14
-            spaceBefore=6 # More breathing room
+            leading=16, # Reduced from 20
+            spaceBefore=12 # Clear space after the bold line
         )
         
         accreditation_style = ParagraphStyle(
@@ -740,7 +740,7 @@ async def export_results_pdf(request: Request):
         logo_img = "LOGO"
         if os.path.exists(logo_path):
             try:
-                logo_img = Image(logo_path, width=0.85*inch, height=0.85*inch)
+                logo_img = Image(logo_path, width=1.15*inch, height=1.15*inch)
             except:
                 pass
 
@@ -753,16 +753,18 @@ async def export_results_pdf(request: Request):
         text_table = Table(text_content, colWidths=[8*inch])
         text_table.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'TOP'),
-            ('TOPPADDING', (0,0), (-1,-1), 0),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+            ('TOPPADDING', (0,0), (-1,0), 0),    # No top padding for first row
+            ('TOPPADDING', (0,1), (-1,1), 10),   # 10pt gap below the bold line for the subheading (Balanced)
+            ('TOPPADDING', (0,2), (-1,2), 2),    # Tighter spacing for NAAC line
+            ('BOTTOMPADDING', (0,0), (-1,0), 8), # 8pt gap above the bold line (Balanced)
             ('LEFTPADDING', (0,0), (-1,-1), 0),
-            ('LINEBELOW', (0,0), (0,0), 1.5, colors.HexColor("#800000")), # Bold Dark Brown line below title
+            ('LINEBELOW', (0,0), (0,0), 3.5, colors.HexColor("#1e293b")), # Very bold dark line
         ]))
 
-        header_table = Table([[logo_img, text_table]], colWidths=[1.1*inch, 8.5*inch])
+        header_table = Table([[logo_img, text_table]], colWidths=[1.4*inch, 8.5*inch])
         header_table.setStyle(TableStyle([
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('LEFTPADDING', (1,0), (1,0), 12),
+            ('LEFTPADDING', (1,0), (1,0), 15), # Added space between logo and text
         ]))
         
         elements.append(header_table)
