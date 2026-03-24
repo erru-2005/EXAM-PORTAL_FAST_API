@@ -9,6 +9,12 @@ import json
 from app.core.sockets import active_connections
 from app.db.mongodb import get_database
 from datetime import datetime
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 router = APIRouter()
 
@@ -560,3 +566,254 @@ async def export_results_excel(request: Request):
     }
     
     return StreamingResponse(output, headers=headers, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+@router.get("/export-pdf")
+async def export_results_pdf(request: Request):
+    try:
+        if request.cookies.get("admin_session") != "authenticated":
+            raise HTTPException(status_code=401)
+        
+        db = await get_database()
+        students = await db["students"].find({"status": "completed"}).to_list(length=1000)
+        
+        config = get_portal_config()
+        # Forces the user's requested title
+        exam_title = "CA CS ENTRANCE EXAM RESULTS"
+        
+        from app.utils.excel_utils import parse_exam_questions
+        exam_data = parse_exam_questions("app/Questions/exam_questions.xlsx")
+        
+        sections = exam_data.get("sections", [])
+        total_possible = exam_data.get("total_questions", 100)
+        
+        styles = getSampleStyleSheet()
+        
+        # Header row for table
+        table_headers = ["NAME", "PARENT NAME", "MOBILE NO"]
+        for sec in sections:
+            table_headers.append(f"{sec['name'].upper()} ({sec['count']})")
+        table_headers.append(f"TOTAL ({total_possible})")
+        
+        # Use Paragraphs for headers to enable wrapping if needed
+        p_headers = [Paragraph(f"<b>{h}</b>", styles['Normal']) for h in table_headers]
+        table_data = [p_headers]
+        
+        for s in students:
+            total_correct = 0
+            section_scores = []
+            for section in sections:
+                sec_correct = 0
+                for q in section["questions"]:
+                    if s.get("answers", {}).get(q["id"]) == q["correct"]:
+                        sec_correct += 1
+                        total_correct += 1
+                section_scores.append(str(sec_correct))
+            
+            row = [
+                Paragraph(s.get("name", "--") or "--", styles['Normal']),
+                Paragraph(s.get("parent_name", "--") or "--", styles['Normal']),
+                Paragraph(s.get("mobile", "--") or "--", styles['Normal']),
+                *section_scores,
+                str(total_correct)
+            ]
+            table_data.append(row)
+
+        if len(table_data) == 1:
+            table_data.append(["No results found"] + [""] * (len(table_headers) - 1))
+
+        output = BytesIO()
+        # Use landscape A4 for wider tables
+        doc = SimpleDocTemplate(output, pagesize=landscape(A4), rightMargin=30, leftMargin=30, topMargin=40, bottomMargin=30)
+        elements = []
+        
+        # Custom Page Styles
+        # Custom Page Styles for a Premium Look
+        college_title_style = ParagraphStyle(
+            'CollegeTitle',
+            parent=styles['Normal'],
+            fontSize=22,
+            textColor=colors.HexColor("#800000"), # Professional Dark Brown
+            fontName='Helvetica-Bold',
+            alignment=TA_LEFT,
+            leading=32, # Increased from 28
+            spaceAfter=4
+        )
+        
+        college_subtitle_style = ParagraphStyle(
+            'CollegeSubtitle',
+            parent=styles['Normal'],
+            fontSize=11,
+            textColor=colors.black,
+            fontName='Helvetica',
+            alignment=TA_LEFT,
+            leading=18, # Increased from 14
+            spaceBefore=6 # More breathing room
+        )
+        
+        accreditation_style = ParagraphStyle(
+            'Accreditation',
+            parent=styles['Normal'],
+            fontSize=9.5,
+            textColor=colors.HexColor("#0056b3"), # Professional blue
+            fontName='Helvetica',
+            alignment=TA_LEFT,
+            leading=16, # Increased from 12
+            spaceBefore=4
+        )
+        
+        exam_title_style = ParagraphStyle(
+            'ExamTitle',
+            parent=styles['Normal'],
+            fontSize=16,
+            textColor=colors.HexColor("#1E293B"),
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold',
+            spaceBefore=20,
+            spaceAfter=8,
+            leading=20
+        )
+        
+        academic_year_style = ParagraphStyle(
+            'AcademicYear',
+            parent=styles['Normal'],
+            fontSize=11,
+            textColor=colors.HexColor("#64748B"),
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold',
+            spaceAfter=25
+        )
+
+        # 1. College Header with Logo
+        # 1. College Header with Logo
+        logo_path = "app/static/logo/clglogo.png"
+        logo_img = "LOGO"
+        if os.path.exists(logo_path):
+            try:
+                logo_img = Image(logo_path, width=0.85*inch, height=0.85*inch)
+            except:
+                pass
+
+        # Text part of the header
+        text_content = [
+            [Paragraph("Dr. B. B. Hegde First Grade College, Kundapura", college_title_style)],
+            [Paragraph("A Unit of Coondapur Education Society(R)", college_subtitle_style)],
+            [Paragraph("Accredited by NAAC with B++ Grade, Affiliated to Mangalore University, Karnataka", accreditation_style)]
+        ]
+        text_table = Table(text_content, colWidths=[8*inch])
+        text_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('TOPPADDING', (0,0), (-1,-1), 0),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+            ('LEFTPADDING', (0,0), (-1,-1), 0),
+            ('LINEBELOW', (0,0), (0,0), 1.5, colors.HexColor("#800000")), # Bold Dark Brown line below title
+        ]))
+
+        header_table = Table([[logo_img, text_table]], colWidths=[1.1*inch, 8.5*inch])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('LEFTPADDING', (1,0), (1,0), 12),
+        ]))
+        
+        elements.append(header_table)
+        elements.append(HRFlowable(width="100%", thickness=2, color=colors.black, spaceBefore=4, spaceAfter=2))
+        
+        # 2. Main Title
+        elements.append(Paragraph(exam_title, exam_title_style))
+        
+        # Academic Year subtitle
+        current_year = datetime.now().year
+        ay_text = f"ACADEMIC YEAR {current_year}-{str(current_year+1)[2:]}"
+        elements.append(Paragraph(f"<b>{ay_text}</b>", academic_year_style))
+
+        # 3. Results Table
+        num_cols = len(table_headers)
+        
+        # Balanced widths for single-line content
+        name_w = 1.6*inch
+        parent_w = 1.5*inch
+        mobile_w = 1.2*inch # Wider to fit 10-digit numbers in one line
+        total_w = 0.9*inch # Wider to fit "TOTAL (100)" in one line
+        
+        # Give remaining space to section columns
+        remaining_w = (10.5*inch) - (name_w + parent_w + mobile_w + total_w)
+        num_sections = len(sections) if sections else 1
+        sec_w = remaining_w / num_sections
+        
+        col_widths = [name_w, parent_w, mobile_w] + [sec_w] * (num_cols - 4) + [total_w]
+        
+        # Table Styling
+        header_style = ParagraphStyle(
+            'HeaderStyle',
+            parent=styles['Normal'],
+            fontSize=8, # Smaller to ensure single-line headers
+            textColor=colors.whitesmoke,
+            fontName='Helvetica-Bold',
+            alignment=TA_CENTER,
+            leading=10,
+            allowWidows=0,
+            allowOrphans=0
+        )
+        
+        content_style = ParagraphStyle(
+            'ContentStyle',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor=colors.HexColor("#334155"), # Navy Slate for differentiation
+            fontName='Helvetica',
+            alignment=TA_LEFT,
+            leading=12
+        )
+        
+        # Wrap all content in Paragraphs for better alignment and wrapping
+        styled_table_data = []
+        for i, row in enumerate(table_data):
+            if i == 0:
+                # Header row
+                styled_table_data.append([Paragraph(f"<b>{h}</b>", header_style) if isinstance(h, str) else h for h in table_headers])
+            else:
+                # Content rows
+                new_row = []
+                for cell in row:
+                    if isinstance(cell, Paragraph):
+                        new_row.append(cell)
+                    else:
+                        new_row.append(Paragraph(str(cell), content_style))
+                styled_table_data.append(new_row)
+
+        t = Table(styled_table_data, colWidths=col_widths, repeatRows=1)
+        
+        # Subtle zebra striping and sharp borders
+        table_style_list = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0F172A")), # Dark header
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('GRID', (0, 0), (-1, -1), 0.7, colors.HexColor("#94A3B8")), # Sharp borders
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#F1F5F9")]), # Balanced zebra differentiation
+        ]
+        
+        # Left align Name, Parent, Mobile columns (0, 1, 2)
+        for row_idx in range(1, len(styled_table_data)):
+            table_style_list.append(('ALIGN', (0, row_idx), (2, row_idx), 'LEFT'))
+
+        t.setStyle(TableStyle(table_style_list))
+        
+        elements.append(t)
+        
+        # Build PDF and return
+        doc.build(elements)
+        output.seek(0)
+        
+        resp_headers = {
+            'Content-Disposition': f'attachment; filename="exam_results_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+        }
+        return Response(content=output.getvalue(), media_type="application/pdf", headers=resp_headers)
+        
+    except Exception as e:
+        import traceback
+        error_msg = f"PDF EXPORT ERROR: {str(e)}\n\n{traceback.format_exc()}"
+        print(error_msg)
+        return Response(content=error_msg, status_code=500, media_type="text/plain")

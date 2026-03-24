@@ -77,6 +77,7 @@
                             </select>
                             <button onclick="refreshList()" class="admin-btn-secondary"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                             <button onclick="exportExcel()" class="admin-btn-secondary"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+                            <button onclick="exportPDF()" class="admin-btn-secondary"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                             <button onclick="deleteAllResults()" class="admin-btn-danger" style="background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;"><i class="fa-solid fa-trash-can"></i> Delete All</button>
                         </div>
                     </div>
@@ -198,6 +199,10 @@
 
         function exportExcel() {
             window.location.href = '/administrator/export-results';
+        }
+
+        function exportPDF() {
+            window.location.href = '/administrator/export-pdf';
         }
 
         window.onload = refreshList;
