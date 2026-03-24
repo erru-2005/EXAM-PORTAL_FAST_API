@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, status, Response, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
+from io import BytesIO
+import pandas as pd
 from typing import Optional
 import os
 import json
@@ -435,3 +437,126 @@ async def delete_all_students(request: Request):
     result = await db["students"].delete_many({})
     
     return {"status": "success", "deleted_count": result.deleted_count}
+
+@router.get("/export-results")
+async def export_results_excel(request: Request):
+    if request.cookies.get("admin_session") != "authenticated":
+        raise HTTPException(status_code=401)
+    
+    db = await get_database()
+    students = await db["students"].find({"status": "completed"}).to_list(length=1000)
+    
+    config = get_portal_config()
+    exam_title = config.get("exam_name", "Exam Results")
+    
+    from app.utils.excel_utils import parse_exam_questions
+    exam_data = parse_exam_questions("app/Questions/exam_questions.xlsx")
+    
+    export_data = []
+    for s in students:
+        total_correct = 0
+        section_scores = {}
+        for section in exam_data["sections"]:
+            sec_correct = 0
+            for q in section["questions"]:
+                if s.get("answers", {}).get(q["id"]) == q["correct"]:
+                    sec_correct += 1
+                    total_correct += 1
+            section_scores[f"{section['name']} ({len(section['questions'])})"] = sec_correct
+        
+        # Calculate Accuracy
+        total_q = exam_data.get("total_questions", 30)
+        accuracy = f"{(total_correct / total_q * 100):.1f}%" if total_q > 0 else "0%"
+        
+        row = {
+            "Student Name": s.get("name", "--") or "--",
+            "Parent Name": s.get("parent_name", "--") or "--",
+            "Mobile/ID": s.get("mobile", "--") or "--",
+            "Stream": s.get("stream", "--") or "--",
+            "Address": s.get("address", "--") or "--",
+            "Overall Score": f"{total_correct}/{total_q}",
+            "Accuracy": accuracy,
+            "Completion Date/Time": s.get("completed_at").strftime("%Y-%m-%d %H:%M:%S") if s.get("completed_at") else "--"
+        }
+        
+        # Add section scores
+        for sec_name, score in section_scores.items():
+            row[sec_name] = score
+            
+        export_data.append(row)
+    
+    if not export_data:
+        # Create an empty row if no results
+        export_data = [{
+            "Student Name": "--",
+            "Mobile/ID": "--",
+            "Overall Score": "--",
+            "Accuracy": "--",
+            "Completion Date/Time": "--"
+        }]
+
+    df = pd.DataFrame(export_data)
+    
+    # Reorder columns: Name, Parent, Mobile, Stream, Address, Score, Accuracy, [Sections], Date
+    cols = ["Student Name", "Parent Name", "Mobile/ID", "Stream", "Address", "Overall Score", "Accuracy"]
+    section_cols = [c for c in df.columns if "(" in c and ")" in c and c not in cols]
+    cols.extend(section_cols)
+    cols.append("Completion Date/Time")
+    
+    df = df[cols]
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        # Write title in first row
+        # We'll use a trick: write the title to cell A1, and start the dataframe from row 4
+        df.to_excel(writer, index=False, sheet_name='Results', startrow=3)
+        
+        workbook = writer.book
+        worksheet = writer.sheets['Results']
+        
+        # Add Exam Title
+        from openpyxl.styles import Font, PatternFill, Alignment
+        worksheet['A1'] = str(exam_title).upper()
+        worksheet['A1'].font = Font(size=22, bold=True, color="1E293B")
+        worksheet['A1'].alignment = Alignment(horizontal='center', vertical='center')
+        worksheet.merge_cells(start_row=1, start_column=1, end_row=2, end_column=len(df.columns))
+        
+        # Style headers
+        header_fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+        
+        for cell in worksheet[4]: # Row 4 contains headers (startrow=3 means dataframe starts at row 4)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            
+        # Set column widths (auto-fit)
+        for col_idx, column in enumerate(df.columns, 1):
+            max_length = 0
+            column_letter = worksheet.cell(row=4, column=col_idx).column_letter
+            
+            # Check header length
+            max_length = max(len(str(column)), max_length)
+            
+            # Check cell content lengths
+            for cell in worksheet[column_letter]:
+                if cell.row < 4: continue
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            
+            adjusted_width = (max_length + 4)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        # Add filters
+        worksheet.auto_filter.ref = f"A4:{worksheet.cell(row=4, column=len(df.columns)).column_letter}{len(df) + 4}"
+
+    output.seek(0)
+    
+    headers = {
+        'Content-Disposition': f'attachment; filename="exam_results_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+    }
+    
+    return StreamingResponse(output, headers=headers, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

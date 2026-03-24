@@ -70,7 +70,11 @@
                 <div class="card" style="padding: 25px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                         <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-square-poll-vertical"></i> Detailed Results Analysis</h3>
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="sortDropdown" onchange="refreshList()" style="padding: 8px 15px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; color: #475569; cursor: pointer; background: white;">
+                                <option value="score">Sort by Score (High to Low)</option>
+                                <option value="name">Sort by Name (A-Z)</option>
+                            </select>
                             <button onclick="refreshList()" class="admin-btn-secondary"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                             <button onclick="exportExcel()" class="admin-btn-secondary"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
                             <button onclick="deleteAllResults()" class="admin-btn-danger" style="background: #fee2e2; color: #ef4444; border: 1px solid #fecaca;"><i class="fa-solid fa-trash-can"></i> Delete All</button>
@@ -102,11 +106,19 @@
             const res = await fetch('/administrator/students-list');
             const data = await res.json();
             const list = document.getElementById('fullResultsList');
+            const sortBy = document.getElementById('sortDropdown').value;
             
-            // Sort by score high to low
-            data.sort((a,b) => b.total_score - a.total_score);
+            // Filter completed students
+            let filteredData = data.filter(s => s.status === 'completed');
 
-            list.innerHTML = data.filter(s => s.status === 'completed').map(s => {
+            // Apply sorting
+            if (sortBy === 'name') {
+                filteredData.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
+                filteredData.sort((a, b) => b.total_score - a.total_score);
+            }
+
+            list.innerHTML = filteredData.map(s => {
                 const sectionBadges = Object.entries(s.section_wise).map(([name, score]) => `
                     <div class="sec-tag">${name}: <strong>${score}</strong></div>
                 `).join('');
@@ -182,6 +194,10 @@
             } else if (confirmation !== null) {
                 alert("Incorrect confirmation text. Global deletion canceled.");
             }
+        }
+
+        function exportExcel() {
+            window.location.href = '/administrator/export-results';
         }
 
         window.onload = refreshList;
