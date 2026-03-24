@@ -46,16 +46,7 @@
             max-width: 580px;
             border: 1px solid rgba(0, 0, 0, 0.05);
 
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {
-                % if show_animations %
-            }
-
-            ,
-            cardShadowPulse 4s ease-in-out infinite alternate {
-                % endif %
-            }
-
-            ;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {% if show_animations %}, cardShadowPulse 4s ease-in-out infinite alternate{% endif %};
             position: relative;
             z-index: 20;
         }
@@ -248,16 +239,7 @@
             border-color: #3b82f6;
             background: #fff;
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
-
-                {
-                % if show_animations %
-            }
-
-            animation: fieldFocusPulse 2s ease-in-out infinite alternate;
-
-                {
-                % endif %
-            }
+            {% if show_animations %}animation: fieldFocusPulse 2s ease-in-out infinite alternate;{% endif %}
         }
 
         @keyframes fieldFocusPulse {
@@ -577,14 +559,15 @@
 
 
 
+    <script>
     async function logViolation(type, reason) {
-    try {
-    await fetch('/administrator/log-violation', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: type, reason: reason })
-    });
-    } catch (e) {}
+        try {
+            await fetch('/administrator/log-violation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: type, reason: reason })
+            });
+        } catch (e) {}
     }
 
     // Right click protection with logging
