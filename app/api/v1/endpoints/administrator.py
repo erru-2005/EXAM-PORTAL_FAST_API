@@ -21,7 +21,7 @@ ADMIN_PASSWORD = "admin12345"
 
 admin_connections: list[WebSocket] = []
 
-async def broadcast_admin_stats():
+async def broadcast_admin_stats(mobile: str | None = None, is_online: bool | None = None):
     db = await get_database()
     active_now = len(active_connections)
     total_enrollments = await db["students"].count_documents({})
@@ -33,6 +33,13 @@ async def broadcast_admin_stats():
         "total_enrollments": total_enrollments,
         "completed_exams": completed_exams
     }
+    
+    # If a specific student's status changed, include that in the broadcast
+    if mobile is not None:
+        msg["status_update"] = {
+            "mobile": mobile,
+            "is_online": is_online
+        }
     
     for conn in admin_connections:
         try:
@@ -192,7 +199,8 @@ async def save_exam_config(
     exit_attempts: int = Form(3),
     real_time_backup: str = Form(None),
     allow_copy: str = Form(None),
-    show_results: str = Form(None)
+    show_results: str = Form(None),
+    admin_notification_duration: int = Form(5)
 ):
     if request.cookies.get("admin_session") != "authenticated":
         return RedirectResponse(url="/administrator/")
@@ -209,7 +217,8 @@ async def save_exam_config(
         "exit_attempts_threshold": exit_attempts,
         "real_time_backup": real_time_backup == "on",
         "allow_copy": allow_copy == "on",
-        "show_results": show_results == "on" if show_results else (show_results == "on" if request.method == "POST" else config.get('show_results', True))
+        "show_results": show_results == "on" if show_results else (show_results == "on" if request.method == "POST" else config.get('show_results', True)),
+        "admin_notification_duration": admin_notification_duration
     })
     
     save_portal_config(config)

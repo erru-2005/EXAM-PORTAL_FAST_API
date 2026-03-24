@@ -89,8 +89,8 @@
 
     <div class="instruction-container">
         <div class="welcome-section" style="margin-bottom: 20px;">
-            <h1 style="color: white; margin-bottom: 15px;">Hello {{ student.name }}!</h1>
-            <p style="font-size: 18px; line-height: 1.6; opacity: 0.9;">"{{ config.motivation_message | replace('[name]', student.name) | replace('[college]', student.college) | replace('[mobile]', student.mobile) }}"</p>
+            <h1 style="color: white; margin-bottom: 15px; text-transform: capitalize;">Hello {{ student.name.lower() }}!</h1>
+            <p style="font-size: 18px; line-height: 1.6; opacity: 0.9;">"{{ config.motivation_message.replace('[name]', student.name).replace('[college]', student.college).replace('[mobile]', student.mobile) }}"</p>
         </div>
 
         <div style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 20px; border-left: 5px solid var(--color-blue-accent);">
@@ -99,7 +99,7 @@
             </div>
             <div style="flex: 1;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <h3 style="margin: 0; color: #1e293b; font-size: 18px;">{{ student.name }}</h3>
+                    <h3 style="margin: 0; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{ student.name.lower() }}</h3>
                     <span style="background: #f1f5f9; color: #475569; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ student.stream }}</span>
                 </div>
                 <p style="margin: 4px 0 0; color: #64748b; font-size: 13px;"><i class="fa-solid fa-location-dot" style="margin-right: 5px; font-size: 11px;"></i> {{ student.address }}</p>

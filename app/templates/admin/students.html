@@ -375,8 +375,29 @@
             }
         }
 
+        // --- Real-time WebSocket for Live Monitoring ---
+        const adminProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const adminWs = new WebSocket(`${adminProtocol}//${window.location.host}/administrator/admin-ws`);
+
+        adminWs.onopen = () => console.log('✅ Admin Monitoring Connected');
+        adminWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'stats') {
+                // Update aggregate stats if they exist on this page
+                if (document.getElementById('active-count')) {
+                    document.getElementById('active-count').innerText = data.active_now;
+                }
+                
+                // If there's an individual status update, refresh the list or update the row
+                if (data.status_update) {
+                    console.log(`Status update for ${data.status_update.mobile}: ${data.status_update.is_online}`);
+                    refreshList(); // Quickest way to sync state across the table
+                }
+            }
+        };
+
         window.onload = refreshList;
-        setInterval(refreshList, 5000); // Auto refresh every 5s
+        setInterval(refreshList, 10000); // Poll every 10s as fallback (longer interval now that WS is active)
     </script>
 </body>
 </html>

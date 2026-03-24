@@ -45,7 +45,17 @@
             width: 100%;
             max-width: 580px;
             border: 1px solid rgba(0, 0, 0, 0.05);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {% if show_animations %}, cardShadowPulse 4s ease-in-out infinite alternate{% endif %};
+
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {
+                % if show_animations %
+            }
+
+            ,
+            cardShadowPulse 4s ease-in-out infinite alternate {
+                % endif %
+            }
+
+            ;
             position: relative;
             z-index: 20;
         }
@@ -238,7 +248,16 @@
             border-color: #3b82f6;
             background: #fff;
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
-            {% if show_animations %}animation: fieldFocusPulse 2s ease-in-out infinite alternate;{% endif %}
+
+                {
+                % if show_animations %
+            }
+
+            animation: fieldFocusPulse 2s ease-in-out infinite alternate;
+
+                {
+                % endif %
+            }
         }
 
         @keyframes fieldFocusPulse {
@@ -425,13 +444,15 @@
                     <label for="stream">Stream</label>
                     <div class="input-icon-group">
                         <i class="fa-solid fa-book"></i>
-                        <select id="stream" name="stream" required style="width: 100%; padding: 16px 16px 16px 55px; border-radius: 15px; border: 2.5px solid #f1f5f9; outline: none; font-family: 'Outfit', sans-serif; font-size: 16px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: #f8fafc; color: #1e293b; appearance: none; cursor: pointer;">
+                        <select id="stream" name="stream" required
+                            style="width: 100%; padding: 16px 16px 16px 55px; border-radius: 15px; border: 2.5px solid #f1f5f9; outline: none; font-family: 'Outfit', sans-serif; font-size: 16px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: #f8fafc; color: #1e293b; appearance: none; cursor: pointer;">
                             <option value="" disabled selected>Select Your Stream</option>
                             <option value="Commerce">Commerce</option>
                             <option value="Arts">Arts</option>
                             <option value="Science">Science</option>
                         </select>
-                        <i class="fa-solid fa-chevron-down" style="left: auto; right: 20px; pointer-events: none; opacity: 0.6;"></i>
+                        <i class="fa-solid fa-chevron-down"
+                            style="left: auto; right: 20px; pointer-events: none; opacity: 0.6;"></i>
                     </div>
                 </div>
 
@@ -439,7 +460,8 @@
                     <label for="address">Permanent Address</label>
                     <div class="input-icon-group">
                         <i class="fa-solid fa-location-dot" style="top: 22px;"></i>
-                        <textarea id="address" name="address" required placeholder="Ex: #123, Main Street, City" style="width: 100%; padding: 16px 16px 16px 55px; border-radius: 15px; border: 2.5px solid #f1f5f9; outline: none; font-family: 'Outfit', sans-serif; font-size: 16px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: #f8fafc; color: #1e293b; height: 100px; resize: none;"></textarea>
+                        <textarea id="address" name="address" required placeholder="Ex: #123, Main Street, City"
+                            style="width: 100%; padding: 16px 16px 16px 55px; border-radius: 15px; border: 2.5px solid #f1f5f9; outline: none; font-family: 'Outfit', sans-serif; font-size: 16px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: #f8fafc; color: #1e293b; height: 100px; resize: none;"></textarea>
                     </div>
                 </div>
 
@@ -483,7 +505,7 @@
         const submitBtn = document.getElementById('submitBtn');
         const paperBurstCont = document.getElementById('paperBurst');
 
-        loginForm.addEventListener('submit', function() {
+        loginForm.addEventListener('submit', function () {
             const studentInfo = {
                 name: document.getElementById('name').value,
                 parent_name: document.getElementById('parent_name').value,
@@ -537,7 +559,7 @@
         // Security Script
         {% if not config.inspect_allow %}
         document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
+        document.onkeydown = function (e) {
             if (e.keyCode == 123) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
@@ -554,42 +576,24 @@
 
 
 
-    <script>
-        {% if config.enforce_fullscreen %}
-        document.addEventListener('click', async () => {
-            if (!document.fullscreenElement) {
-                try {
-                    const el = document.documentElement;
-                    if (el.requestFullscreen) await el.requestFullscreen();
-                    else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-                } catch (err) {}
-            }
-        });
 
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                logViolation("fullscreen_exit_login", "User exited full-screen on login page");
-            }
-        });
-        {% endif %}
+    async function logViolation(type, reason) {
+    try {
+    await fetch('/administrator/log-violation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: type, reason: reason })
+    });
+    } catch (e) {}
+    }
 
-        async function logViolation(type, reason) {
-            try {
-                await fetch('/administrator/log-violation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: type, reason: reason })
-                });
-            } catch (e) {}
-        }
-
-        // Right click protection with logging
-        {% if not config.inspect_allow %}
-        document.addEventListener('contextmenu', e => {
-            e.preventDefault();
-            logViolation("right_click", "Right click attempted on login page");
-        });
-        {% endif %}
+    // Right click protection with logging
+    {% if not config.inspect_allow %}
+    document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    logViolation("right_click", "Right click attempted on login page");
+    });
+    {% endif %}
     </script>
 </body>
 

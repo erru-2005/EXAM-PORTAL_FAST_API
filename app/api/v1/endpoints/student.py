@@ -20,13 +20,28 @@ async def websocket_endpoint(websocket: WebSocket):
     mobile: str | None = None
     try:
         # First message must be a join request containing the student's mobile number
-        join_msg = await websocket.receive_json()
+        try:
+            join_msg = await websocket.receive_json()
+        except:
+            await websocket.close(code=1008)
+            return
+
         if join_msg.get("type") != "join" or "mobile" not in join_msg:
             await websocket.close(code=1008)
             return
+            
         mobile = join_msg["mobile"]
+        
+        # Close any existing connection for this mobile to avoid "stale" offline status
+        if mobile in active_connections:
+            try:
+                await active_connections[mobile].close(code=1000, reason="New connection established")
+            except:
+                pass
+                
         active_connections[mobile] = websocket
-        await broadcast_admin_stats()
+        await broadcast_admin_stats(mobile=mobile, is_online=True)
+        
         # Send any previously saved state (answers and remaining timer) to the client
         student = await db["students"].find_one({"mobile": mobile})
         if student:
@@ -71,7 +86,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         if mobile and mobile in active_connections:
             del active_connections[mobile]
-        await broadcast_admin_stats()
+        await broadcast_admin_stats(mobile=mobile, is_online=False)
     finally:
         try:
             await websocket.close()
@@ -190,6 +205,7 @@ async def exam_page(request: Request):
     response = templates.TemplateResponse("student/exam.html", {
         "request": request,
         "config": config,
+        "student": student,
         "sections": exam_data["sections"],
         "answers": student.get("answers", {}),
         "remaining_seconds": student.get("remaining_seconds", config.get("total_time_minutes", 60) * 60)
@@ -236,7 +252,7 @@ async def finish_exam_api(request: Request):
         {"mobile": mobile},
         {"$set": {"status": "completed", "completed_at": datetime.now()}}
     )
-    await broadcast_admin_stats()
+    await broadcast_admin_stats(mobile=mobile, is_online=False)
     return {"status": "success"}
 
 @router.get("/results", response_class=HTMLResponse)

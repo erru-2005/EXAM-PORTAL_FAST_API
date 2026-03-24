@@ -128,14 +128,24 @@
                         </div>
 
                         <!-- Attempts to Leave Full Screen -->
-                        <div class="form-row" style="background-color: #fff8f8; border-color: #fee2e2;">
-                            <div class="form-label-group">
-                                <label>Suspicious Exit Threshold</label>
-                                <p>Number of attempts allowed for a student to leave full-screen before auto-submission.</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                            <div class="form-row" style="background-color: #fff8f8; border-color: #fee2e2; margin-bottom: 0;">
+                                <div class="form-label-group">
+                                    <label>Suspicious Exit Threshold</label>
+                                    <p>Attempts allowed before auto-submission.</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="number" name="exit_attempts" value="{{ config.get('exit_attempts_threshold', 3) }}" min="1" max="10" class="input-small-pill">
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="number" name="exit_attempts" value="{{ config.get('exit_attempts_threshold', 3) }}" min="1" max="10" class="input-small-pill">
-                                <span style="font-weight: 600; color: #e53e3e;">Attempts</span>
+                            <div class="form-row" style="background-color: #f8fafc; border-color: #e2e8f0; margin-bottom: 0;">
+                                <div class="form-label-group">
+                                    <label>Announcement Duration</label>
+                                    <p>How long (seconds) admin popups stay visible.</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="number" name="admin_notification_duration" value="{{ config.get('admin_notification_duration', 5) }}" min="2" max="30" class="input-small-pill">
+                                </div>
                             </div>
                         </div>
 

@@ -124,21 +124,25 @@
 <body style="background-color: var(--color-white-off);">
 
     <div class="college-header-wrapper">
-        <div class="college-header">
-            <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
-            <div class="header-text-container">
-                <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
-                <div class="header-separator"></div>
-                <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+        <div class="college-header" style="display: flex; justify-content: flex-start; align-items: center; padding: 12px 30px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo" style="height: 70px;">
+                <div class="header-text-container" style="text-align: left;">
+                    <h1 class="college-title" style="margin: 0; font-size: 24px; color: #7c0000; font-weight: 800;">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                    <div class="header-separator" style="width: 100%; border-bottom: 2px solid #1e293b; margin: 5px 0;"></div>
+                    <p class="header-subtext" style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">A Unit of Coondapur Education Society(R)</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="result-container">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 32px; color: var(--color-dark-bg); margin-bottom: 10px;">Examination Completed!</h1>
-            <p style="color: #666; font-size: 18px;">Well done, <strong>{{ student.name }}</strong> ({{ student.college
-                }})</p>
+        <div style="text-align: left; margin-bottom: 40px; padding-left: 10px;">
+            <h1 style="font-size: 32px; color: var(--color-dark-bg); margin-bottom: 15px; font-weight: 800;">Examination Completed!</h1>
+            <p style="color: #64748b; font-size: 20px; font-weight: 600;">
+                Well done, <strong style="color: #1e293b; text-transform: capitalize;">{{ student.name.lower() }}</strong> 
+                (<strong style="color: #1e293b; text-transform: capitalize;">{{ student.college.lower() }}</strong>)
+            </p>
         </div>
 
         {% if config.get('show_results', True) %}

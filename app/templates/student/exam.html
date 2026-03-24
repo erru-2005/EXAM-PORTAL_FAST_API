@@ -424,25 +424,60 @@
 
     <!-- Custom Modal Structure -->
     <div class="modal-overlay" id="customModal">
-        <div class="modal-card">
-            <div class="modal-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="modal-card" id="modalCard">
+            <div class="modal-icon"><i class="fa-solid fa-circle-question" id="modalIcon"></i></div>
             <div class="modal-title" id="modalTitle">Confirm Action</div>
-            <div class="modal-body" id="modalBody">Are you sure you want to proceed with this action?</div>
-            <div class="modal-actions">
+            <div class="modal-body" id="modalBody">
+                Are you sure you want to proceed with this action?
+            </div>
+            <div class="modal-actions" id="modalActions">
                 <button class="btn-modal btn-modal-cancel" id="modalCancel">Cancel</button>
                 <button class="btn-modal btn-modal-confirm" id="modalConfirm">Yes, Proceed</button>
             </div>
         </div>
     </div>
 
+    <!-- Admin Announcement Toast -->
+    <div id="adminToast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); z-index: 9999; background: #1e293b; color: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; min-width: 400px; max-width: 600px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; pointer-events: none; border-left: 6px solid #3b82f6;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px; color: #3b82f6; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>Message from Admin</span>
+            </div>
+            <button onclick="hideAdminToast()" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 0;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding-left: 2px;">
+            <strong style="color: #94a3b8; font-size: 15px; white-space: nowrap;">Admin:</strong>
+            <p id="adminToastText" style="margin: 0; font-size: 16px; line-height: 1.5; color: #f8fafc; font-weight: 500;"></p>
+        </div>
+        <div id="toastTimer" style="position: absolute; bottom: 0; left: 0; height: 3px; background: #3b82f6; width: 100%; transition: width linear;"></div>
+    </div>
+
     <div class="page-wrapper">
         <div class="college-header-wrapper">
-            <div class="college-header">
-                <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo">
-                <div class="header-text-container">
-                    <h1 class="college-title">Dr. B. B. Hegde First Grade College, Kundapura</h1>
-                    <div class="header-separator"></div>
-                    <p class="header-subtext">A Unit of Coondapur Education Society(R)</p>
+            <div class="college-header" style="display: flex; justify-content: flex-start; align-items: center; padding: 12px 30px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <img src="/static/logo/clglogo.png" alt="College Logo" class="college-logo" style="height: 70px;">
+                    <div class="header-text-container" style="text-align: left;">
+                        <h1 class="college-title" style="margin: 0; font-size: 24px; color: #7c0000; font-weight: 800;">Dr. B. B. Hegde First Grade College, Kundapura</h1>
+                        <div class="header-separator" style="width: 100%; border-bottom: 2px solid #1e293b; margin: 5px 0;"></div>
+                        <p class="header-subtext" style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">A Unit of Coondapur Education Society(R)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Candidate Info Bar -->
+        <div class="candidate-info-bar" style="background: white; border-bottom: 2px solid #e2e8f0; padding: 12px 30px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: flex-start; gap: 40px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANDIDATE:</span>
+                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{ student.name.lower() }}</span>
+                </div>
+                <div style="width: 2px; height: 20px; background: #e2e8f0;"></div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLLEGE:</span>
+                    <span style="font-weight: 800; color: #1e293b; font-size: 18px; text-transform: capitalize;">{{ student.college.lower() }}</span>
                 </div>
             </div>
         </div>
@@ -496,7 +531,14 @@
                         </div>
                         {% endfor %}
 
-                        <div style="padding: 40px 0; text-align: center;">
+                        <div style="padding: 40px 0; display: flex; justify-content: center; gap: 20px;">
+                            {% if not loop.first %}
+                            <button class="btn-primary" onclick="switchSection('{{ sections[loop.index0 - 1].name }}')"
+                                style="background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; max-width: 250px; font-size: 16px; box-shadow: none;">
+                                <i class="fa-solid fa-arrow-left" style="margin-right: 10px;"></i> Previous Section
+                            </button>
+                            {% endif %}
+
                             {% if not loop.last %}
                             <button class="btn-primary" onclick="switchSection('{{ sections[loop.index].name }}')"
                                 style="background-color: var(--color-blue-accent); max-width: 300px; font-size: 18px;">
@@ -703,63 +745,69 @@
 
 
         // Initialize WebSocket for real-time communication
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const ws = new WebSocket(`${protocol}//${window.location.host}/student/ws`);
+        // --- Enhanced WebSocket with Reconnection ---
+        let ws;
+        let reconnectInterval = 3000;
+        let heartbeatInterval;
 
-        ws.onopen = () => {
-            console.log('WebSocket Connected');
-            const mobile = getCookie('student_mobile');
-            if (mobile) {
-                ws.send(JSON.stringify({ type: 'join', mobile: mobile }));
-            }
-        };
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/student/ws`);
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'admin_message') {
-                showAdminNotice(data.message);
-            } else if (data.type === 'state') {
-                // Restore state from server
-                if (data.answers) {
-                    answers = { ...answers, ...data.answers };
-                    saveToLocalBackup(); // Sync local backup with server state
-                    // Update UI for restored answers
-                    Object.entries(answers).forEach(([qid, key]) => {
-                        updateAnswerUI(qid, key);
-                    });
+            ws.onopen = () => {
+                console.log('✅ WebSocket Connected');
+                const mobile = getCookie('student_mobile');
+                if (mobile) {
+                    ws.send(JSON.stringify({ type: 'join', mobile: mobile }));
                 }
-                if (data.remaining_seconds !== null && data.remaining_seconds !== undefined) {
-                    // Only accept server time if it's strictly less than our current ticking time
-                    // This prevents stale 30s backups from adding time back upon reconnection
-                    if (data.remaining_seconds < totalSeconds) {
-                        totalSeconds = data.remaining_seconds;
+                reconnectInterval = 3000; // Reset backoff
+                
+                // Start Heartbeat to keep connection alive
+                if (heartbeatInterval) clearInterval(heartbeatInterval);
+                heartbeatInterval = setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'ping' }));
                     }
-                }
-                updateProgress();
-            } else if (data.type === 'pong') {
-                // Keep-alive heartbeat
-            }
-        };
+                }, 30000); // 30s heartbeat
+            };
 
-        function showAdminNotice(msg) {
-            const notice = document.createElement('div');
-            notice.className = 'admin-popup-notice';
-            notice.innerHTML = `
-                <div class="notice-content">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>${msg}</span>
-                </div>
-            `;
-            document.body.appendChild(notice);
-            setTimeout(() => {
-                notice.style.opacity = '0';
-                setTimeout(() => notice.remove(), 550);
-            }, 5000);
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'admin_message') {
+                    showAdminNotice(data.message);
+                } else if (data.type === 'state') {
+                    if (data.answers) {
+                        answers = { ...answers, ...data.answers };
+                        saveToLocalBackup();
+                        Object.entries(answers).forEach(([qid, key]) => {
+                            updateAnswerUI(qid, key);
+                        });
+                    }
+                    if (data.remaining_seconds !== null && data.remaining_seconds !== undefined) {
+                        if (data.remaining_seconds < totalSeconds) {
+                            totalSeconds = data.remaining_seconds;
+                        }
+                    }
+                    updateProgress();
+                }
+            };
+
+            ws.onclose = (e) => {
+                console.warn(`❌ WebSocket disconnected (${e.code}). Reconnecting in ${reconnectInterval / 1000}s...`);
+                if (heartbeatInterval) clearInterval(heartbeatInterval);
+                if (!isSubmitting) {
+                    setTimeout(initWebSocket, reconnectInterval);
+                    reconnectInterval = Math.min(reconnectInterval * 1.5, 30000); // Cap backoff at 30s
+                }
+            };
+
+            ws.onerror = (err) => {
+                console.error('Socket Error:', err);
+                ws.close();
+            };
         }
 
-        ws.onclose = () => {
-            console.warn('WebSocket disconnected. Attempting to save via fallback...');
-        };
+        initWebSocket();
 
         // Backup interval – send full state every 30 seconds
         const backupInterval = setInterval(() => {
@@ -869,10 +917,21 @@
 
         let isSubmitting = false;
 
-        function showCustomModal(title, body, confirmText, callback) {
+        function showCustomModal(title, body, confirmText, callback, isSummary = false) {
             const modal = document.getElementById('customModal');
             document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalBody').innerText = body;
+            const bodyEl = document.getElementById('modalBody');
+            
+            if (isSummary) {
+                bodyEl.innerHTML = body;
+                document.getElementById('modalCard').style.maxWidth = '600px';
+                document.getElementById('modalIcon').className = 'fa-solid fa-clipboard-list';
+            } else {
+                bodyEl.innerHTML = body; // Use innerHTML to allow formatted content
+                document.getElementById('modalCard').style.maxWidth = '450px';
+                document.getElementById('modalIcon').className = 'fa-solid fa-circle-question';
+            }
+            
             const confirmBtn = document.getElementById('modalConfirm');
             confirmBtn.innerText = confirmText;
 
@@ -895,31 +954,121 @@
         }
 
         function confirmFinish() {
+            let summaryHtml = `
+                <p style="margin-bottom: 15px; color: #64748b; font-weight: 600;">Please review your attempt summary below before final submission:</p>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; text-align: left; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <thead>
+                            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                <th style="padding: 12px 15px; color: #1e293b;">Section Name</th>
+                                <th style="padding: 12px 15px; text-align: center; color: #1e293b;">Attended</th>
+                                <th style="padding: 12px 15px; text-align: center; color: #1e293b;">Unattended</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            sectionsData.forEach(sec => {
+                let attended = 0;
+                sec.questions.forEach(q => {
+                    if (answers[q.id]) attended++;
+                });
+                let unattended = sec.questions.length - attended;
+                summaryHtml += `
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px 15px; font-weight: 700; color: #334155;">${sec.name}</td>
+                        <td style="padding: 12px 15px; text-align: center;"><span style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: 700;">${attended}</span></td>
+                        <td style="padding: 12px 15px; text-align: center;"><span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-weight: 700;">${unattended}</span></td>
+                    </tr>
+                `;
+            });
+
+            summaryHtml += `
+                        </tbody>
+                    </table>
+                </div>
+                <p style="color: #ef4444; font-weight: 700; font-size: 14px;"><i class="fa-solid fa-triangle-exclamation"></i> Are you sure? You cannot modify answers after submission.</p>
+            `;
+
             showCustomModal(
-                "Final Submission",
-                "Are you sure you want to submit your exam? You cannot change your answers after submission.",
+                "Final Submission Summary",
+                summaryHtml,
                 "Yes, Submit Exam",
                 (confirmed) => {
                     if (confirmed) {
                         isSubmitting = true;
                         finishExam();
                     }
-                }
+                },
+                true
             );
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.remove('active');
+        }
+
+        async function logViolation(type, reason) {
+            try {
+                const response = await fetch('/administrator/log-violation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, reason })
+                });
+                return await response.json();
+            } catch (err) {
+                console.error("Error logging violation:", err);
+            }
+        }
+
+        let toastTimeout;
+        function showAdminNotice(message) {
+            const toast = document.getElementById('adminToast');
+            const text = document.getElementById('adminToastText');
+            const timerBar = document.getElementById('toastTimer');
+            const duration = {{ config.get('admin_notification_duration', 5) }} * 1000;
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            
+            text.innerText = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.style.pointerEvents = 'auto';
+            
+            // Reset and start timer bar
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            setTimeout(() => {
+                timerBar.style.transition = `width ${duration}ms linear`;
+                timerBar.style.width = '0%';
+            }, 10);
+
+            toastTimeout = setTimeout(hideAdminToast, duration);
+        }
+
+        function hideAdminToast() {
+            const toast = document.getElementById('adminToast');
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(-100px)';
+            toast.style.pointerEvents = 'none';
+            if (toastTimeout) clearTimeout(toastTimeout);
         }
 
         function createSparkles() {
             const paperBurstCont = document.getElementById('paperBurst');
             if(!paperBurstCont) return;
             paperBurstCont.innerHTML = '';
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 60; i++) {
                 const s = document.createElement('div');
                 s.className = 'sparkle-particle';
-                const angle = (i / 30) * Math.PI * 2;
-                const dist = 50 + Math.random() * 50;
+                const angle = (i / 60) * Math.PI * 2;
+                const dist = 80 + Math.random() * 150;
                 s.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
                 s.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
-                s.style.background = ['#FFD700', '#FFFACD', '#10b981', '#3b82f6'][Math.floor(Math.random() * 4)];
+                s.style.width = (Math.random() * 8 + 4) + 'px';
+                s.style.height = (Math.random() * 8 + 4) + 'px';
+                s.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                s.style.background = ['#FFD700', '#FFFACD', '#10b981', '#3b82f6', '#f472b6', '#a78bfa'][Math.floor(Math.random() * 6)];
                 paperBurstCont.appendChild(s);
             }
         }
@@ -960,13 +1109,11 @@
 
             if (totalSeconds <= 0) {
                 clearInterval(timerInterval);
-                isSubmitting = true;
-                showCustomModal(
-                    "Time's Up!",
-                    "Your exam time has expired. Your responses are being submitted automatically.",
-                    "View Results",
-                    () => finishExam()
-                );
+                if (!isSubmitting) {
+                    isSubmitting = true;
+                    showAdminNotice("Time's Up! Auto-submitting your exam...");
+                    finishExam();
+                }
             } else {
                 const hours = Math.floor(totalSeconds / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -1021,42 +1168,37 @@
             else if (el.msRequestFullscreen) el.msRequestFullscreen();
         }
 
-        async function logViolation(type, reason) {
-            try {
-                await fetch('/administrator/log-violation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: type, reason: reason })
-                });
-            } catch (e) {
-                console.error("Failed to log violation:", e);
+        async function handleFullScreenExit() {
+            if (ENFORCE_FULLSCREEN && !document.fullscreenElement && !isSubmitting) {
+                violations++;
+                await logViolation("fullscreen_exit", `Exited full-screen mode (Violation ${violations})`);
+
+                if (violations > MAX_VIOLATIONS) {
+                    isSubmitting = true;
+                    showAdminNotice("Maximum violations reached. Auto-submitting...");
+                    finishExam();
+                } else {
+                    showCustomModal(
+                        "FULL-SCREEN MANDATORY",
+                        `<div style="text-align:center;">
+                            <i class="fa-solid fa-expand fa-3x" style="color:#ef4444; margin-bottom:15px; display:block;"></i>
+                            <p style="font-size:16px; font-weight:600; color:#1e293b;">You exited full-screen mode. This is NOT allowed.</p>
+                            <p style="color:#64748b; margin-top:10px;">You have <strong>${MAX_VIOLATIONS + 1 - violations}</strong> attempts remaining before disqualification.</p>
+                         </div>`,
+                        "Return to Full-Screen",
+                        () => {
+                            enterFullScreen();
+                            closeCustomModal();
+                        }
+                    );
+                }
             }
         }
 
-        async function handleFullScreenExit() {
-            if (!document.fullscreenElement && !isSubmitting) {
-                violations++;
-                enterFullScreen(); // Force re-entry
-
-                await logViolation("fullscreen_exit", "Exited full-screen mode");
-
-                if (violations > MAX_VIOLATIONS) {
-                    // Maximum violations reached - force submit immediately without prompt
-                    isSubmitting = true;
-                    showAdminNotice("Maximum violations reached. Auto-submitting...");
-                    const modal = document.getElementById('customModal');
-                    if (modal) modal.classList.remove('active');
-                    
-                    finishExam();
-                } else {
-                    showAdminNotice(`SECURITY ALERT: Full-screen exit detected! Violation ${violations}/${MAX_VIOLATIONS + 1}`);
-                    showCustomModal(
-                        "Security Warning!",
-                        `You exited full-screen mode. This is NOT allowed. You have ${MAX_VIOLATIONS - violations + 1} more attempt(s) before automatic disqualification.`,
-                        "Return to Full-Screen",
-                        () => enterFullScreen()
-                    );
-                }
+        // On window click anywhere, re-enforce full screen if it was dropped
+        window.onclick = function() {
+            if (ENFORCE_FULLSCREEN && !document.fullscreenElement && !isSubmitting) {
+                enterFullScreen();
             }
         }
 
