@@ -311,14 +311,35 @@
         const scoreChart = new Chart(ctx, {
             type: 'doughnut',
             data: chartData,
-        options: {
-            cutout: '70%',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                layout: {
+                    padding: 20 // Added padding to prevent clipping on hover
+                },
                 plugins: {
-                legend: {
-                    display: false
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false, // Removes the little color box that was looking like a "cutting box"
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 14 }
+                    }
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
                 }
             }
-        }
         });
     </script>
 
