@@ -40,6 +40,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 pass
                 
         active_connections[mobile] = websocket
+        print(f"📡 [WebSocket] Student {mobile} joined active session.") # Debug print for join
         await broadcast_admin_stats(mobile=mobile, is_online=True)
         
         # Send any previously saved state (answers and remaining timer) to the client
@@ -86,6 +87,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         if mobile and mobile in active_connections:
             del active_connections[mobile]
+            print(f"🔌 [WebSocket] Student {mobile} disconnected.")
         await broadcast_admin_stats(mobile=mobile, is_online=False)
     finally:
         try:
@@ -151,6 +153,7 @@ async def register_student(
             "status": "active",
             "answers": {}
         })
+    await broadcast_admin_stats()
     
     response = RedirectResponse(url="/student/instructions", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie("student_mobile", mobile)

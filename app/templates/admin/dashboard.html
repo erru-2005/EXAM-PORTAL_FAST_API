@@ -93,33 +93,480 @@
                     </div>
                 </div>
 
-
-
-                    <!-- Student Monitoring Section -->
-                    <div class="card" style="margin-top: 20px; padding: 25px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                            <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-users-viewfinder"></i> Live Student Monitoring</h3>
-                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                                <div id="filterIndicator" style="display: none; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid #bae6fd;">
-                                    Filter: <span id="filterName">All</span> <i class="fa-solid fa-xmark" style="margin-left:5px; cursor:pointer;" onclick="setFilter('total')"></i>
-                                </div>
-                                <div style="position: relative; display: flex; align-items: center;">
-                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: #94a3b8; font-size: 14px;"></i>
-                                    <input type="text" id="dashboardSearch" onkeyup="refreshStudents()" placeholder="Search Name, Mobile or Password..." style="padding: 8px 12px 8px 30px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; width: 250px;">
-                                </div>
-                                <select id="sortStudents" onchange="refreshStudents()" class="admin-select" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none;">
-                                    <option value="name_asc">Name (A-Z)</option>
-                                    <option value="name_desc">Name (Z-A)</option>
-                                    <option value="score_desc">Marks (High-Low)</option>
-                                    <option value="score_asc">Marks (Low-High)</option>
-                                    <option value="violations">Most Violations</option>
-                                </select>
-                                <button onclick="refreshStudents()" class="admin-btn-secondary"><i class="fa-solid fa-rotate"></i> Refresh</button>
-                                <button onclick="deleteAllRecords()" class="admin-btn-danger"><i class="fa-solid fa-trash-can"></i> Delete All</button>
+                <!-- Announcement Center -->
+                <div class="card" style="margin-top: 20px; padding: 25px; border: 2.5px solid #1e293b; border-radius: 12px; background: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #000;"><i class="fa-solid fa-bullhorn" style="margin-right: 10px;"></i> Announcement Center</h3>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div id="broadcastStatus" style="display: none; font-size: 13px; font-weight: 800; color: #166534; background: #dcfce7; padding: 6px 15px; border-radius: 20px; border: 1px solid #166534;">
+                                <i class="fa-solid fa-circle-check"></i> Last broadcast reached <span id="reachedCount">0</span> students.
                             </div>
+                            <button onclick="broadcastMessage()" class="admin-btn-primary" style="background: #000; color: #fff; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; font-size: 14px; transition: transform 0.2s;">
+                                Broadcast to All Active <i class="fa-solid fa-paper-plane"></i>
+                            </button>
                         </div>
+                    </div>
+                    <textarea id="broadcastInput" placeholder="Type a message to show to all active students (TOP-MIDDLE popup)..." style="width: 100%; height: 90px; padding: 18px; border-radius: 12px; border: 2.5px solid #1e293b; font-size: 15px; font-weight: 600; outline: none; resize: vertical; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s;"></textarea>
+                    <p style="margin-top: 10px; font-size: 11px; color: #64748b; font-weight: 700;">* This will show up instantly on the student's screen as a persistent popup.</p>
+                </div>
+
+                <!-- Student Monitoring Section -->
+                <div class="card" style="margin-top: 20px; padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h3 style="margin: 0; font-size: 18px; color: var(--color-dark-bg);"><i class="fa-solid fa-users-viewfinder"></i> Live Student Monitoring</h3>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div id="filterIndicator" style="display: none; background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid #bae6fd;">
+                                Filter: <span id="filterName">All</span> <i class="fa-solid fa-xmark" style="margin-left:5px; cursor:pointer;" onclick="setFilter('total')"></i>
+                            </div>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: #94a3b8; font-size: 14px;"></i>
+                                <input type="text" id="dashboardSearch" onkeyup="refreshStudents()" placeholder="Search Name, Mobile or Password..." style="padding: 8px 12px 8px 30px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; width: 250px;">
+                            </div>
+                            <select id="sortStudents" onchange="refreshStudents()" class="admin-select" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none;">
+                                <option value="name_asc">Name (A-Z)</option>
+                                <option value="name_desc">Name (Z-A)</option>
+                                <option value="score_desc">Marks (High-Low)</option>
+                                <option value="score_asc">Marks (Low-High)</option>
+                                <option value="violations">Most Violations</option>
+                            </select>
+                            <button onclick="refreshStudents()" class="admin-btn-secondary"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            <button onclick="deleteAllRecords()" class="admin-btn-danger"><i class="fa-solid fa-trash-can"></i> Delete All</button>
+                        </div>
+                    </div>
+
+                    <div id="studentCardsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .admin-body { padding: 15px !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-sizing: border-box; }
+                .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                .admin-table th { text-align: left; padding: 15px; background: #f1f5f9; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; }
+                .admin-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
+                .admin-btn-danger { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; transition: background 0.2s; }
+                .admin-btn-danger:hover { background: #dc2626; }
+                
+                /* New B&W Card Styles */
+                .student-card-bw { background: white; border: 1.2px solid #000; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; transition: all 0.2s ease; position: relative; }
+                .student-card-bw:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+                .student-card-bw.live-border { border-color: #22c55e; border-width: 2px; box-shadow: 0 0 10px rgba(34, 197, 94, 0.3); }
+                
+                .card-header-bw { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+                .student-name-wrap { font-weight: 800; font-size: 13px; color: #000; word-break: break-all; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-transform: capitalize; }
+                .student-info-small { font-size: 10px; color: #64748b; margin-top: 1px; text-transform: capitalize; }
+                
+                .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; position: relative; }
+                .online-dot::after { content: ''; position: absolute; width: 100%; height: 100%; background: inherit; border-radius: inherit; animation: pulse-green 2s infinite; }
+                @keyframes pulse-green { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+                .offline-dot { width: 10px; height: 10px; background: #cbd5e1; border-radius: 50%; }
+                
+                .progress-container-bw { margin-bottom: 15px; }
+                .progress-label-bw { font-size: 11px; font-weight: 800; color: #000; margin-bottom: 6px; display: flex; justify-content: space-between; }
+                .progress-bar-bg-bw { background: #f1f5f9; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0; }
+                .progress-bar-fill-bw { background: #000; height: 100%; transition: width 0.6s ease; }
+
+                .card-counts-bw { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 10px; background: #f8fafc; padding: 6px; border-radius: 6px; border: 1px dashed #cbd5e1; }
+                .count-item-bw { text-align: center; }
+                .count-val-bw { display: block; font-size: 12px; font-weight: 900; color: #000; }
+                .count-label-bw { display: block; font-size: 7px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+
+                .card-stats-grid-bw { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+                .stat-item-bw { display: flex; flex-direction: column; align-items: center; }
+                .stat-label-bw { font-size: 7px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+                .stat-val-bw { font-size: 11px; font-weight: 900; color: #000; }
+
+                .card-footer-bw { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px; border-top: 1.5px solid #000; }
+                .status-pill-completed { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; }
+                .status-pill-active { background: #fff; color: #000; border: 1.5px solid #000; padding: 1px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; }
+                .card-actions-bw { display: flex; gap: 6px; }
+                .card-actions-bw button { background: none; border: none; font-size: 14px; cursor: pointer; color: #000; transition: transform 0.2s; }
+                .card-actions-bw button:hover { transform: scale(1.2); }
+                
+                /* Styled Questions Modal */
+                .history-item { margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; }
+                .history-q { font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 14px; }
+                .history-ans { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+                .history-correct { color: #166534; background: #dcfce7; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+                .history-wrong { color: #991b1b; background: #fee2e2; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+                .history-none { color: #475569; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+
+                /* Modal Styles */
+                .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+                .modal-card { background: white; width: 95%; max-width: 800px; max-height: 90vh; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: modal-in 0.3s ease-out; }
+                @keyframes modal-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                .modal-header { padding: 20px 30px; border-bottom: 2.5px solid #000; display: flex; justify-content: space-between; align-items: center; background: white; }
+                .modal-body { padding: 30px; overflow-y: auto; flex-grow: 1; background: #fcfcfc; }
+            </style>
+        </div>
+    </div>
+
+    <!-- Backup Viewer Modal -->
+    <div id="backupModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalStudentName" style="margin: 0; color: var(--color-dark-bg); text-transform: capitalize;">Student Backup</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+    <!-- Direct Message Modal -->
+    <div id="directMessageModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 style="margin: 0; color: #000;"><i class="fa-solid fa-paper-plane"></i> Message: <span id="dmStudentName" style="text-transform: capitalize;">Student</span></h3>
+                <button onclick="closeDMModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 25px;">
+                <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 10px;">ENTER YOUR MESSAGE:</label>
+                <textarea id="directMessageInput" placeholder="Type your message here..." style="width: 100%; height: 120px; padding: 15px; border-radius: 12px; border: 2.5px solid #000; font-size: 15px; font-weight: 600; outline: none; box-sizing: border-box; font-family: inherit;"></textarea>
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button onclick="closeDMModal()" style="padding: 10px 20px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: 700; cursor: pointer;">Cancel</button>
+                    <button onclick="sendDirectMessage()" style="padding: 10px 25px; border-radius: 10px; border: none; background: #000; color: white; font-weight: 700; cursor: pointer;">Send Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}/administrator/admin-ws`);
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'stats') {
+                if (data.student_update) {
+                    updateSingleCard(data.student_update);
+                } else {
+                    // This is a general stats broadcast or count change (e.g. deletion)
+                    if (data.active_now !== undefined) document.getElementById('stat-active-now').innerText = data.active_now;
+                    if (data.total_enrollments !== undefined) document.getElementById('stat-total-students').innerText = data.total_enrollments;
+                    if (data.completed_exams !== undefined) document.getElementById('stat-completed-exams').innerText = data.completed_exams;
+                    if (data.pending_exams !== undefined) document.getElementById('stat-pending-exams').innerText = data.pending_exams;
+                    
+                    refreshStudents(); 
+                }
+            }
+        };
+
+        function updateSingleCard(s) {
+            // 1. Update the global state source of truth
+            const idx = allStudentsRaw.findIndex(item => item.mobile === s.mobile);
+            if (idx !== -1) {
+                allStudentsRaw[idx] = s;
+            } else {
+                allStudentsRaw.push(s);
+            }
+            
+            // 2. Sync the top counters immediately
+            syncDashboardStats();
+
+            // 3. Update the UI card
+            const container = document.getElementById('studentCardsGrid');
+            const cardId = `card-${s.mobile}`;
+            let card = document.getElementById(cardId);
+            
+            const cardHtml = renderCardHtml(s);
+            
+            if (card) {
+                card.outerHTML = cardHtml;
+            } else {
+                // If it's a new student or one that was filtered out, we might need a full re-render
+                // to maintain sort order and filter consistency
+                applyFiltersAndSearch(); 
+            }
+        }
+
+        function renderCardHtml(s) {
+            const progress = (s.correct_count / (s.total_questions || 1)) * 100;
+            const onlineStatus = s.is_online ? 'online-dot' : 'offline-dot';
+            const liveClass = s.is_online ? 'live-border' : '';
+            const statusClass = s.status === 'completed' ? 'status-pill-completed' : 'status-pill-active';
+            
+            // Escape single quotes for use in onclick
+            const safeName = s.name.replace(/'/g, "\\'");
+            
+            return `
+                <div class="student-card-bw ${liveClass}" id="card-${s.mobile}">
+                    <div class="card-header-bw">
+                        <div style="flex: 1; overflow: hidden;">
+                            <div class="student-name-wrap" title="${s.name}">${s.name}</div>
+                            <div class="student-info-small">${s.mobile} | ${s.college || 'No College'}</div>
+                        </div>
+                        <div class="${onlineStatus}"></div>
+                    </div>
+                    
+                    <div class="progress-container-bw">
+                        <div class="progress-label-bw">
+                            <span>Score Progress</span>
+                            <span>${s.correct_count}/${s.total_questions}</span>
+                        </div>
+                        <div class="progress-bar-bg-bw">
+                            <div class="progress-bar-fill-bw" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-counts-bw">
+                        <div class="count-item-bw">
+                            <span class="count-val-bw" style="color: #166534;">${s.correct_count}</span>
+                            <span class="count-label-bw">Correct</span>
+                        </div>
+                        <div class="count-item-bw">
+                            <span class="count-val-bw" style="color: #991b1b;">${s.incorrect_count}</span>
+                            <span class="count-label-bw">Wrong</span>
+                        </div>
+                        <div class="count-item-bw">
+                            <span class="count-val-bw" style="color: #64748b;">${s.unattended_count}</span>
+                            <span class="count-label-bw">Skipped</span>
+                        </div>
+                    </div>
+
+                    <div class="card-stats-grid-bw">
+                        <div class="stat-item-bw">
+                            <span class="stat-label-bw">TOTAL</span>
+                            <span class="stat-val-bw">${s.total_score}</span>
+                        </div>
+                        <div class="stat-item-bw">
+                            <span class="stat-label-bw">VIOLATIONS</span>
+                            <span class="stat-val-bw ${s.violation_count > 0 ? 'text-danger-bw' : ''}">${s.violation_count}</span>
+                        </div>
+                        <div class="stat-item-bw">
+                            <span class="stat-label-bw">TIME</span>
+                            <span class="stat-val-bw">${s.time_remaining || '00:00'}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer-bw">
+                        <span class="${statusClass}">${s.status.toUpperCase()}</span>
+                        <div class="card-actions-bw">
+                            <button onclick="viewBackup('${s.mobile}', '${safeName}')" title="View Detail"><i class="fa-solid fa-circle-info"></i></button>
+                            <button onclick="openDirectMessageModal('${s.mobile}', '${safeName}')" title="Message" ${!s.is_online ? 'disabled style="opacity:0.3"' : ''}><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let currentFilterType = 'total';
+
+        function setFilter(type) {
+            currentFilterType = type;
+            const indicator = document.getElementById('filterIndicator');
+            const filterName = document.getElementById('filterName');
+            
+            if (type === 'total') {
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'flex';
+                filterName.innerText = type.charAt(0).toUpperCase() + type.slice(1);
+            }
+            
+            refreshStudents();
+            
+            // Scroll to the monitoring section
+            document.getElementById('studentCardsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        let allStudentsRaw = [];
+        
+        function syncDashboardStats() {
+            if (!allStudentsRaw || allStudentsRaw.length === 0) return;
+            
+            const activeCount = allStudentsRaw.filter(s => s.is_online).length;
+            const totalCount = allStudentsRaw.length;
+            const completedCount = allStudentsRaw.filter(s => s.status === 'completed').length;
+            const pendingCount = totalCount - completedCount;
+            
+            const activeEl = document.getElementById('stat-active-now');
+            const totalEl = document.getElementById('stat-total-students');
+            const completedEl = document.getElementById('stat-completed-exams');
+            const pendingEl = document.getElementById('stat-pending-exams');
+            
+            if (activeEl) activeEl.innerText = activeCount;
+            if (totalEl) totalEl.innerText = totalCount;
+            if (completedEl) completedEl.innerText = completedCount;
+            if (pendingEl) pendingEl.innerText = pendingCount;
+        }
+
+        async function refreshStudents() {
+            try {
+                const response = await fetch('/administrator/students-list');
+                allStudentsRaw = await response.json();
+                
+                let students = [...allStudentsRaw];
+                syncDashboardStats();
+                
+                const searchKey = document.getElementById('dashboardSearch').value.toLowerCase();
+                
+                // Apply Search
+                if (searchKey) {
+                    students = students.filter(s => 
+                        s.name.toLowerCase().includes(searchKey) || 
+                        s.mobile.includes(searchKey) || 
+                        (s.password && s.password.toLowerCase().includes(searchKey))
+                    );
+                }
+
+                // Apply Filter
+                if (currentFilterType === 'active') {
+                    students = students.filter(s => s.is_online);
+                } else if (currentFilterType === 'completed') {
+                    students = students.filter(s => s.status === 'completed');
+                } else if (currentFilterType === 'pending') {
+                    students = students.filter(s => s.status !== 'completed');
+                }
+
+                const sortVal = document.getElementById('sortStudents').value;
+                if (sortVal === 'name_asc') students.sort((a,b) => a.name.localeCompare(b.name));
+                else if (sortVal === 'name_desc') students.sort((a,b) => b.name.localeCompare(a.name));
+                else if (sortVal === 'score_desc') students.sort((a,b) => b.total_score - a.total_score);
+                else if (sortVal === 'score_asc') students.sort((a,b) => a.total_score - b.total_score);
+                else if (sortVal === 'violations') students.sort((a,b) => b.violation_count - a.violation_count);
+
+                const list = document.getElementById('studentCardsGrid');
+                list.innerHTML = students.map(s => renderCardHtml(s)).join('');
+            } catch (err) { console.error('Failed to load students:', err); }
+        }
+
+        async function deleteAllRecords() {
+            const confirmText = prompt("WARNING: This will delete ALL student records!\nType 'DELETE' to confirm:");
+            if (confirmText === 'DELETE') {
+                try {
+                    const response = await fetch('/administrator/delete-all-students', { method: 'DELETE' });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        alert(`Successfully deleted ${data.deleted_count} records.`);
+                        refreshStudents();
+                    } else {
+                        alert('Failed to delete records.');
+                    }
+                } catch (err) { alert('An error occurred.'); }
+            } else {
+                alert('Deletion cancelled. Incorrect confirmation.');
+            }
+        }
+
+        async function viewBackup(mobile, name) {
+            document.getElementById('modalStudentName').innerText = `${name} - Exam Progress`;
+            document.getElementById('backupModal').style.display = 'flex';
+            document.getElementById('modalContent').innerHTML = '<div style="text-align:center; padding: 20px;">Loading exam trace...</div>';
+            
+            try {
+                const response = await fetch(`/administrator/student-backup/${mobile}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const sections = data.sections || [];
+                    
+                    let totalC = 0, totalW = 0, totalU = 0;
+                    sections.forEach(sec => {
+                        sec.questions.forEach(q => {
+                            if (!q.answered) totalU++;
+                            else if (q.is_correct) totalC++;
+                            else totalW++;
+                        });
+                    });
+
+                    let html = `
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; justify-content: space-around; text-align: center;">
+                            <div><div style="font-size: 20px; font-weight: 900; color: #166534;">${totalC}</div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correct</div></div>
+                            <div><div style="font-size: 20px; font-weight: 900; color: #991b1b;">${totalW}</div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase;">Wrong</div></div>
+                            <div><div style="font-size: 20px; font-weight: 900; color: #475569;">${totalU}</div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase;">Skipped</div></div>
+                        </div>
+                    `;
+
+                    sections.forEach(sec => {
+                        html += `<h4 style="color: #0369a1; border-bottom: 2px solid #e0f2fe; padding-bottom: 8px; margin-top: 20px;">${sec.name}</h4>`;
+                        sec.questions.forEach((q, idx) => {
+                            let statusHtml = '';
+                            if (!q.answered) {
+                                statusHtml = `<span class="history-none"><i class="fa-solid fa-circle-minus"></i> Unattended</span>`;
+                            } else if (q.is_correct) {
+                                statusHtml = `<span class="history-correct"><i class="fa-solid fa-circle-check"></i> Correct: ${q.student_answer}</span>`;
+                            } else {
+                                statusHtml = `<span class="history-wrong"><i class="fa-solid fa-circle-xmark"></i> Incorrect: ${q.student_answer} (Correct: ${q.correct_answer})</span>`;
+                            }
+
+                            html += `
+                                <div class="history-item">
+                                    <div class="history-q">Question ${idx + 1}: ${q.text}</div>
+                                    <div class="history-ans">${statusHtml}</div>
+                                </div>
+                            `;
+                        });
+                    });
+                    document.getElementById('modalContent').innerHTML = html;
+                } else {
+                    document.getElementById('modalContent').innerHTML = '<div style="color:red">No backup data found for this student.</div>';
+                }
+            } catch (err) {
+                document.getElementById('modalContent').innerHTML = '<div style="color:red">Error loading backup data.</div>';
+            }
+        }
 
         function closeModal() { document.getElementById('backupModal').style.display = 'none'; }
+
+        let currentTargetMobile = null;
+        function openDirectMessageModal(mobile, name) {
+            currentTargetMobile = mobile;
+            document.getElementById('dmStudentName').innerText = name;
+            document.getElementById('directMessageInput').value = '';
+            document.getElementById('directMessageModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('directMessageInput').focus(), 100);
+        }
+        function closeDMModal() {
+            document.getElementById('directMessageModal').style.display = 'none';
+        }
+        async function sendDirectMessage() {
+            const input = document.getElementById('directMessageInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            try {
+                const res = await fetch('/administrator/broadcast-message', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg, mobile: currentTargetMobile })
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.count > 0) {
+                    closeDMModal();
+                    // Show a quick success indicator on the card if needed
+                } else {
+                    alert('Message failed. Student might be offline.');
+                }
+            } catch (err) { alert('Error sending message'); }
+        }
+
+        async function broadcastMessage() {
+            const input = document.getElementById('broadcastInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            
+            try {
+                const res = await fetch('/administrator/broadcast-message', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    document.getElementById('broadcastStatus').style.display = 'flex';
+                    document.getElementById('reachedCount').innerText = data.count;
+                    input.value = '';
+                    setTimeout(() => {
+                        document.getElementById('broadcastStatus').style.display = 'none';
+                    }, 5000);
+                } else {
+                    alert('Broadcast failed: ' + (data.message || 'Server error'));
+                }
+            } catch (err) { alert('Broadcast failed'); }
+        }
 
         window.onload = refreshStudents;
         setInterval(refreshStudents, 30000); // Periodic refresh

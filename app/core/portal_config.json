@@ -1,5 +1,5 @@
 {
-    "exam_name": "General Entrance Examination 2026",
+    "exam_name": "CA/CMA/CS Fundamental Scholarship Examination 2026",
     "motivation_message": "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
     "instructions": [
         "Please ensure you have a stable internet connection throughout the exam.",
@@ -11,12 +11,12 @@
     "total_time_minutes": 60,
     "start_time": "2026-03-24T09:26",
     "enforce_fullscreen": true,
-    "show_login_animations": false,
+    "show_login_animations": true,
     "inspect_allow": false,
-    "exit_attempts_threshold": 3,
+    "exit_attempts_threshold": 5,
     "real_time_backup": true,
     "allow_copy": false,
     "show_results": true,
-    "admin_notification_duration": 5,
+    "admin_notification_duration": 12,
     "countdown_before_exam": 25
 }

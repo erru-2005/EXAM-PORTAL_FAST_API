@@ -32,7 +32,7 @@ async def broadcast_admin_stats(mobile: str | None = None, is_online: bool | Non
     active_now = len(active_connections)
     total_enrollments = await db["students"].count_documents({})
     completed_exams = await db["students"].count_documents({"status": "completed"})
-    
+    active_now = len(active_connections)
     pending_exams = total_enrollments - completed_exams
     
     msg = {
@@ -73,7 +73,7 @@ async def broadcast_admin_stats(mobile: str | None = None, is_online: bool | Non
             
             msg["student_update"] = student
     
-    for conn in admin_connections:
+    for conn in admin_connections[:]:
         try:
             await conn.send_json(msg)
         except:
@@ -399,17 +399,39 @@ async def broadcast_message(request: Request):
     
     data = await request.json()
     message = data.get("message")
+    mobile_target = data.get("mobile") # Optional target student
     
     count = 0
-    for mobile, ws in active_connections.items():
-        try:
-            await ws.send_json({
-                "type": "admin_message",
-                "message": message
-            })
-            count += 1
-        except:
-            pass
+    print(f"📡 [WebSocket] Admin attempting broadcast. Active keys: {list(active_connections.keys())}")
+    
+    if mobile_target:
+        # Direct Message
+        ws = active_connections.get(mobile_target)
+        if ws:
+            try:
+                await ws.send_json({
+                    "type": "admin_message",
+                    "message": message
+                })
+                count = 1
+                print(f"✅ [WebSocket] Direct message delivered to student socket: {mobile_target}")
+            except Exception as e:
+                print(f"❌ [WebSocket] Failed to deliver to student socket {mobile_target}: {e}")
+        else:
+            print(f"⚠️ [WebSocket] Student {mobile_target} NOT FOUND in active connections. They might be offline.")
+    else:
+        # Global Broadcast
+        for mobile, ws in list(active_connections.items()):
+            try:
+                await ws.send_json({
+                    "type": "admin_message",
+                    "message": message
+                })
+                count += 1
+            except Exception as e:
+                print(f"❌ [WebSocket] Broadcast failed for {mobile}: {e}")
+        print(f"✅ [WebSocket] Broadcast sent to {count} students.")
+                
     return {"status": "success", "count": count}
 
 @router.get("/student-backup/{mobile}")
@@ -440,9 +462,10 @@ async def get_student_backup(request: Request, mobile: str):
         backup_data.append(sec_data)
         
     return {
+        "status": "success",
         "name": student["name"],
         "sections": backup_data,
-        "status": student.get("status"),
+        "current_status": student.get("status"),
         "violation_count": student.get("violation_count", 0),
         "violations_list": student.get("violations", [])
     }
@@ -470,6 +493,7 @@ async def log_violation(request: Request):
             }
         }
     )
+    await broadcast_admin_stats(mobile=mobile)
     return {"status": "success"}
 
 @router.delete("/delete-student/{mobile}")
@@ -483,6 +507,7 @@ async def delete_student(request: Request, mobile: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Student not found")
         
+    await broadcast_admin_stats()
     return {"status": "success"}
 
 @router.delete("/delete-all-students")
@@ -493,6 +518,7 @@ async def delete_all_students(request: Request):
     db = await get_database()
     result = await db["students"].delete_many({})
     
+    await broadcast_admin_stats()
     return {"status": "success", "deleted_count": result.deleted_count}
 
 @router.get("/export-results")

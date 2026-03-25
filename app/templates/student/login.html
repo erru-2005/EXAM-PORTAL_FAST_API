@@ -16,48 +16,24 @@
         :root {
             --primary-gradient: linear-gradient(135deg, #1e3a8a, #2563eb);
             --card-shadow: 0 40px 70px -15px rgba(30, 58, 138, 0.12), 0 20px 40px -20px rgba(59, 130, 246, 0.15);
-            --pulse-color: #3b82f6;
-            --circuit-line: rgba(255, 255, 255, 0.25);
-            --node-color: rgba(59, 130, 246, 0.2);
         }
 
         body {
             background-color: #f1f5f9;
             overflow-x: hidden;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .login-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 120px);
-            padding: 20px 5%;
-            gap: 50px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .login-card {
-            background: #ffffff;
-            padding: 50px;
-            border-radius: 30px;
-            box-shadow: var(--card-shadow);
-            width: 100%;
-            max-width: 580px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {% if show_animations %}, cardShadowPulse 4s ease-in-out infinite alternate{% endif %};
-            position: relative;
-            z-index: 20;
-        }
-
-        @keyframes cardShadowPulse {
-            0% {
-                box-shadow: 0 40px 70px -15px rgba(30, 58, 138, 0.12), 0 20px 40px -20px rgba(59, 130, 246, 0.15);
+        @keyframes slideUpFade {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
             }
 
-            100% {
-                box-shadow: 0 45px 80px -10px rgba(30, 58, 138, 0.18), 0 25px 50px -15px rgba(59, 130, 246, 0.3);
+            to {
+                transform: translateY(0);
+                opacity: 1;
             }
         }
 
@@ -121,42 +97,75 @@
             r: 1.5;
         }
 
-        .exam-title-container {
-            margin-bottom: 40px;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .exam-main-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 900;
-            background: linear-gradient(to right, #1e3a8a, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            margin-bottom: 5px;
-            letter-spacing: -0.5px;
-            white-space: nowrap;
-        }
-
-        .illustration-container {
-            flex: 1;
+        .login-wrapper {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            animation: fadeIn 1.2s ease-out;
+            justify-content: flex-start;
+            min-height: calc(100vh - 150px);
+            padding: 0px 5% 50px; /* Removed top padding */
+            gap: 0px;
             position: relative;
             z-index: 10;
         }
 
-        .illustration-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 30px;
-            filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.12));
+        .login-card {
+            background: #ffffff;
+            padding: 25px 50px 50px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #f1f5f9;
+            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            z-index: 15;
+            z-index: 20;
+        }
+
+        .exam-title-container {
+            margin-bottom: 45px;
+            text-align: left;
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        .exam-main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 34px;
+            font-weight: 900;
+            color: #1e293b;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .exam-title-underline {
+            height: 2px;
+            width: 100%;
+            background: #3b82f6;
+            margin-top: 10px;
+        }
+
+        .illustration-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: -40px;
+            /* Move upwards closer to the header */
+            margin-bottom: -10px;
+            /* Extra tightened space between image and form */
+            animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+            position: relative;
+            z-index: 25;
+        }
+
+        .illustration-image {
+            max-width: 520px;
+            /* Significantly enlarged image */
+            height: auto;
+            filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.06));
+            position: relative;
+            z-index: 25;
         }
 
         @keyframes slideUp {
@@ -239,7 +248,6 @@
             border-color: #3b82f6;
             background: #fff;
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
-            {% if show_animations %}animation: fieldFocusPulse 2s ease-in-out infinite alternate;{% endif %}
         }
 
         @keyframes fieldFocusPulse {
@@ -300,23 +308,29 @@
             }
         }
 
-        @media (max-width: 1150px) {
+        @media (max-width: 1024px) {
             .login-wrapper {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 padding: 40px 20px;
-                gap: 40px;
+                gap: 60px;
+                text-align: center;
+            }
+
+            .login-card {
+                justify-self: center;
+                padding: 40px;
             }
 
             .illustration-container {
-                order: -1;
-            }
-
-            .illustration-image {
-                max-width: 75%;
-            }
-
-            .circuit-bg {
                 display: none;
+            }
+
+            .exam-title-container {
+                text-align: center;
+            }
+
+            .exam-title-underline {
+                margin: 0 auto;
             }
         }
     </style>
@@ -338,63 +352,18 @@
     </div>
 
     <div class="login-wrapper">
-        {% if show_animations %}
-        <!-- Complex Branched Circuit Backdrop -->
-        <svg class="circuit-bg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
-            <!-- Central Connection Paths (Image to Card) -->
-            <!-- Path A: High Branch -->
-            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="circuit-line" />
-            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="pulse-trail"
-                style="animation-delay: -1s;" />
-            <path d="M800,100 L650,100 L650,50 L400,50 L400,200 L200,200" class="current-pulse"
-                style="animation-delay: -1s;" />
 
-            <!-- Path B: Mid Upper -->
-            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="circuit-line" />
-            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="pulse-trail"
-                style="animation-delay: -2s;" />
-            <path d="M850,250 L700,250 L700,150 L350,150 L350,280 L200,280" class="current-pulse"
-                style="animation-delay: -2s;" />
-
-            <!-- Path C: The Main Zig-Zag -->
-            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="circuit-line" />
-            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="pulse-trail"
-                style="animation-duration: 3.5s;" />
-            <path d="M900,300 L800,300 L800,250 L650,250 L650,350 L450,350 L450,300 L200,300" class="current-pulse"
-                style="animation-duration: 3.5s;" />
-
-            <!-- Path D: Lower Branch -->
-            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="circuit-line" />
-            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="pulse-trail"
-                style="animation-delay: -3.5s;" />
-            <path d="M850,450 L600,450 L600,500 L300,500 L300,380 L200,380" class="current-pulse"
-                style="animation-delay: -3.5s;" />
-
-            <!-- Path E: Deep Lower -->
-            <path d="M800,550 L550,550 L550,450 L200,450" class="circuit-line" />
-            <path d="M800,550 L550,550 L550,450 L200,450" class="pulse-trail" style="animation-delay: -0.5s;" />
-            <path d="M800,550 L550,550 L550,450 L200,450" class="current-pulse" style="animation-delay: -0.5s;" />
-
-            <!-- Nodes (Circuit Joints) -->
-            <circle cx="650" cy="100" class="circuit-node" />
-            <circle cx="400" cy="50" class="circuit-node" />
-            <circle cx="700" cy="250" class="circuit-node" />
-            <circle cx="350" cy="150" class="circuit-node" />
-            <circle cx="750" cy="300" class="circuit-node" />
-            <circle cx="500" cy="350" class="circuit-node" />
-            <circle cx="600" cy="450" class="circuit-node" />
-            <circle cx="800" cy="300" class="circuit-node" />
-            <circle cx="650" cy="250" class="circuit-node" />
-            <circle cx="450" cy="350" class="circuit-node" />
-        </svg>
-        {% endif %}
+        <!-- Illustration Side -->
+        <div class="illustration-container">
+            <img src="/static/assets/professional-growth-and-academic-achievement-illustration-svg-download-png-13863377.webp"
+                alt="Academic Achievement" class="illustration-image">
+        </div>
 
         <!-- Form Side -->
         <div class="login-card">
-            <div class="exam-title-container">
+            <div class="exam-title-container" style="margin: 0 auto 45px; text-align: center;">
                 <h1 class="exam-main-title">{{ exam_name }}</h1>
-                <div style="height: 4px; width: 60px; background: #3b82f6; margin: 15px auto; border-radius: 2px;">
-                </div>
+                <div class="exam-title-underline" style="margin: 0 auto;"></div>
             </div>
 
             <form action="/student/register" method="post" id="loginForm">
@@ -469,12 +438,6 @@
                     Begin Examination <i class="fa-solid fa-arrow-right-long"></i>
                 </button>
             </form>
-        </div>
-
-        <!-- Illustration Side -->
-        <div class="illustration-container">
-            <img src="/static/assets/professional-growth-and-academic-achievement-illustration-svg-download-png-13863377.webp"
-                alt="Academic Achievement" class="illustration-image">
         </div>
     </div>
 
@@ -560,23 +523,23 @@
 
 
     <script>
-    async function logViolation(type, reason) {
-        try {
-            await fetch('/administrator/log-violation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: type, reason: reason })
-            });
-        } catch (e) {}
-    }
+        async function logViolation(type, reason) {
+            try {
+                await fetch('/administrator/log-violation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type, reason: reason })
+                });
+            } catch (e) { }
+        }
 
-    // Right click protection with logging
-    {% if not config.inspect_allow %}
-    document.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    logViolation("right_click", "Right click attempted on login page");
-    });
-    {% endif %}
+        // Right click protection with logging
+        {% if not config.inspect_allow %}
+        document.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            logViolation("right_click", "Right click attempted on login page");
+        });
+        {% endif %}
     </script>
 </body>
 

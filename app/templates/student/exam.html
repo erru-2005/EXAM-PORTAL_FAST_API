@@ -418,89 +418,115 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #readyToStartBtn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(62, 39, 35, 0.5);
+            background: linear-gradient(135deg, #3e2723, #1b100e) !important;
+        }
+
+        #readyToStartBtn:hover i {
+            transform: translateX(5px);
+        }
+
+        #countdown-box.ready {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Custom Modal Structure -->
-    <div class="modal-overlay" id="customModal">
-        <div class="modal-card" id="modalCard">
-            <div class="modal-icon"><i class="fa-solid fa-circle-question" id="modalIcon"></i></div>
-            <div class="modal-title" id="modalTitle">Confirm Action</div>
-            <div class="modal-body" id="modalBody">
-                Are you sure you want to proceed with this action?
+
+    <!-- Modern Unified Custom Modal -->
+    <div id="customModal" class="modal-overlay" style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10000;">
+        <div id="modalCard" class="modal-card" style="max-width: 480px; padding: 0; background: #ffffff; border-radius: 28px; overflow: hidden; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.3); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <div id="modalHeader" style="background: linear-gradient(135deg, #1e293b, #334155); padding: 30px; text-align: center; position: relative;">
+                <div id="modalIconBox" style="background: rgba(255,255,255,0.1); width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <i id="modalIcon" class="fa-solid fa-circle-question" style="color: white; font-size: 28px;"></i>
+                </div>
+                <h3 id="modalTitle" style="color: white; font-size: 22px; font-weight: 800; margin: 0; font-family: 'Outfit', sans-serif;">Modal Title</h3>
             </div>
-            <div class="modal-actions" id="modalActions">
-                <button class="btn-modal btn-modal-cancel" id="modalCancel">Cancel</button>
-                <button class="btn-modal btn-modal-confirm" id="modalConfirm">Yes, Proceed</button>
+            
+            <div id="modalBody" style="padding: 35px; color: #475569; font-size: 16px; line-height: 1.6; font-family: 'Outfit', sans-serif; text-align: center;">
+            </div>
+            
+            <div id="modalActions" style="padding: 0 35px 35px; display: flex; gap: 15px;">
+                <button id="modalCancel" class="btn" style="flex: 1; padding: 14px; border-radius: 16px; background: #f1f5f9; color: #64748b; font-weight: 800; border: none; font-size: 15px; transition: all 0.3s ease;">Cancel</button>
+                <button id="modalConfirm" class="btn active" style="flex: 1.5; padding: 14px; border-radius: 16px; background: #3b82f6; color: white; border: none; font-weight: 800; font-size: 15px; box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4); transition: all 0.3s ease;">Confirm Action</button>
             </div>
         </div>
     </div>
 
-    <!-- Start Exam Countdown Overlay (Glassmorphism Style) -->
+    <!-- Start Exam Countdown Overlay (Cute Professional Brown Theme) -->
     <div class="modal-overlay active" id="startCountdownOverlay"
-        style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 5000;">
+        style="background: rgba(46, 34, 26, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10000;">
         <div class="modal-card"
-            style="max-width: 420px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.95); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-radius: 24px;">
-            <div class="modal-icon" style="color: var(--color-blue-accent); font-size: 3.5rem; margin-bottom: 15px;"><i
-                    class="fa-solid fa-expand"></i></div>
-            <div class="modal-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">
-                Security Initialization</div>
+            style="max-width: 380px; border: 1.5px solid rgba(139, 94, 60, 0.15); background: #fffcf9; padding: 32px; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4); border-radius: 40px; position: relative; overflow: hidden; transform: scale(0.95);">
+            
+            <div class="modal-icon" style="color: #8d6e63; font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 4px 6px rgba(141, 110, 99, 0.1));">
+                <i class="fa-solid fa-shield-cat"></i>
+            </div>
+            
+            <div class="modal-title" style="font-size: 22px; font-weight: 800; color: #4e342e; margin-bottom: 8px; font-family: 'Outfit', sans-serif; letter-spacing: -0.2px;">
+                Security Check</div>
+            
             <div class="modal-body" style="font-weight: 500; font-family: 'Outfit', sans-serif;">
-                <p style="margin-bottom: 15px; font-size: 15px; color: #475569; line-height: 1.5;">The system is
-                    preparing a secure environment. The screen will automatically transition to <strong>Full-Screen
-                        Mode</strong>.</p>
+                <p style="margin-bottom: 20px; font-size: 14px; color: #6d4c41; line-height: 1.5; opacity: 0.85;">
+                    Establishing a secure environment. <br>Hang tight for a moment!
+                </p>
 
-                <div
-                    style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin: 20px 0;">
-                    <p
-                        style="margin: 0; font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                        Wait for:</p>
+                <div id="countdown-box"
+                    style="background: #efebe9; border-radius: 28px; padding: 18px; margin: 15px 0; transition: all 0.5s ease; width: 120px; margin-left: auto; margin-right: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
                     <div id="initial-countdown-timer"
-                        style="font-size: 52px; font-weight: 900; color: var(--color-blue-accent); line-height: 1;">{{ config.get('countdown_before_exam', 30) }}s</div>
+                        style="font-size: 48px; font-weight: 900; color: #5d4037; line-height: 1; font-family: 'Outfit', sans-serif;">{{ config.get('countdown_before_exam', 30) }}</div>
                 </div>
 
                 <div
-                    style="display: flex; align-items: center; gap: 10px; color: #ef4444; background: #fff1f2; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: left; margin-bottom: 20px;">
-                    <i class="fa-solid fa-shield-halved" style="font-size: 16px;"></i>
-                    <span>Do not attempt to exit full-screen or refresh the page.</span>
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #991b1b; background: #fef2f2; padding: 10px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; border: 1px solid #fee2e2;">
+                    <i class="fa-solid fa-lock" style="font-size: 14px;"></i>
+                    <span>Fullscreen mode is mandatory</span>
                 </div>
 
                 <p
-                    style="color: #0f172a; font-weight: 800; font-size: 18px; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
-                    ALL THE BEST FOR YOUR EXAM!</p>
+                    style="color: #8d6e63; font-weight: 700; font-size: 14px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7;">
+                    Good luck! ✨</p>
             </div>
 
-            <div id="ready-btn-container" style="display: none; margin-top: 10px; animation: slideUp 0.4s ease-out;">
+            <div id="ready-btn-container" style="display: none; margin-top: 10px; animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
                 <button class="btn-primary" id="readyToStartBtn"
-                    style="width: 100%; font-size: 18px; padding: 18px; border-radius: 14px; background: #0f172a; color: white; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.4); letter-spacing: 0.5px;">
-                    READY TO START <i class="fa-solid fa-play"></i>
+                    style="width: 100%; font-size: 17px; padding: 18px; border-radius: 24px; background: linear-gradient(135deg, #5d4037, #3e2723); color: #fff; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 20px -5px rgba(62, 39, 35, 0.3); letter-spacing: 0.5px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Outfit', sans-serif;">
+                    <span>I'm Ready!</span> 
+                    <i class="fa-solid fa-face-smile-wink"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Admin Announcement Toast -->
+    <!-- Enhanced Compact Admin Announcement Toast -->
     <div id="adminToast"
-        style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); z-index: 9999; background: #1e293b; color: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; min-width: 400px; max-width: 600px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; pointer-events: none; border-left: 6px solid #3b82f6;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-            <div
-                style="display: flex; align-items: center; gap: 12px; color: #3b82f6; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fa-solid fa-bullhorn"></i>
-                <span>Message from Admin</span>
-            </div>
-            <button onclick="hideAdminToast()"
-                style="background: none; border: none; color: #64748b; cursor: pointer; padding: 0;"><i
-                    class="fa-solid fa-xmark"></i></button>
+        style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120%); z-index: 9999; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(8px); color: white; padding: 12px 20px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 15px; border: 1.5px solid rgba(255,255,255,0.1); transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; pointer-events: none; min-width: 320px; max-width: 500px;">
+        <div style="background: #3b82f6; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa-solid fa-bullhorn" style="font-size: 14px;"></i>
         </div>
-        <div style="display: flex; align-items: flex-start; gap: 10px; padding-left: 2px;">
-            <strong style="color: #94a3b8; font-size: 15px; white-space: nowrap;">Admin:</strong>
-            <p id="adminToastText"
-                style="margin: 0; font-size: 16px; line-height: 1.5; color: #f8fafc; font-weight: 500;"></p>
+        <div style="flex: 1; overflow: hidden;">
+            <p id="adminToastText" style="margin: 0; font-size: 14px; line-height: 1.2; color: #f8fafc; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
         </div>
-        <div id="toastTimer"
-            style="position: absolute; bottom: 0; left: 0; height: 3px; background: #3b82f6; width: 100%; transition: width linear;">
+        <button onclick="hideAdminToast()" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 5px; font-size: 16px;"><i class="fa-solid fa-xmark"></i></button>
+        <div id="toastTimer" style="position: absolute; bottom: 0; left: 20px; right: 20px; height: 2.5px; background: rgba(59, 130, 246, 0.4); border-radius: 2px; overflow: hidden;">
+            <div id="toastTimerFill" style="height: 100%; background: #3b82f6; width: 100%; transition: width linear;"></div>
         </div>
     </div>
 
@@ -1086,7 +1112,7 @@
         function showAdminNotice(message) {
             const toast = document.getElementById('adminToast');
             const text = document.getElementById('adminToastText');
-            const timerBar = document.getElementById('toastTimer');
+            const timerBar = document.getElementById('toastTimerFill');
             const duration = {{ config.get('admin_notification_duration', 5) }} * 1000;
 
         if (toastTimeout) clearTimeout(toastTimeout);
@@ -1110,7 +1136,7 @@
         function hideAdminToast() {
             const toast = document.getElementById('adminToast');
             toast.style.opacity = '0';
-            toast.style.transform = 'translateX(-50%) translateY(-100px)';
+            toast.style.transform = 'translateX(-50%) translateY(-150%)';
             toast.style.pointerEvents = 'none';
             if (toastTimeout) clearTimeout(toastTimeout);
         }
@@ -1207,62 +1233,107 @@
         restoreFromLocalBackup(); // Initialize from local storage if available
         saveToLocalBackup();      // Ensure initial answers (from server) are backed up immediately
         updateProgress();
-
         // --- Start Countdown Logic with Persistence ---
         const INITIAL_COUNTDOWN_STORAGE_KEY = `exam_initial_countdown_{{ student.mobile }}`;
-        let savedCountdown = localStorage.getItem(INITIAL_COUNTDOWN_STORAGE_KEY);
-        let initialCountdown = savedCountdown !== null ? parseInt(savedCountdown) : {{ config.get('countdown_before_exam', 30) }};
+        const EXAM_STARTED_KEY = `exam_started_{{ student.mobile }}`;
+        const hasExamStarted = localStorage.getItem(EXAM_STARTED_KEY) === 'true';
 
         const initialTimerEl = document.getElementById('initial-countdown-timer');
         const readyBtnCont = document.getElementById('ready-btn-container');
         const countdownOverlay = document.getElementById('startCountdownOverlay');
         const pageWrapper = document.querySelector('.page-wrapper');
 
-        // Initial sync of the timer display
-        if (initialTimerEl) {
-            initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
-        }
-
-        // Blur the page initially with smooth transition
-        pageWrapper.style.transition = 'filter 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        pageWrapper.style.filter = 'blur(15px) saturate(1.2)';
-        pageWrapper.style.pointerEvents = 'none';
-
-        const initialInterval = setInterval(() => {
-            initialCountdown--;
-
-            if (initialCountdown <= 0) {
-                clearInterval(initialInterval);
-                localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, "0");
-                if (initialTimerEl) {
-                    initialTimerEl.innerHTML = "00";
-                    initialTimerEl.style.color = "#10b981";
-                    initialTimerEl.parentElement.style.display = 'none'; // Hide the whole timer box
-                }
-                readyBtnCont.style.display = 'block';
-            } else {
-                localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, initialCountdown.toString());
-                if (initialTimerEl) {
-                    initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
-                }
-            }
-        }, 1000);
-
-        document.getElementById('readyToStartBtn').onclick = function () {
-            enterFullScreen();
-            countdownOverlay.style.opacity = '0';
-            countdownOverlay.style.transform = 'scale(0.9)';
-            countdownOverlay.style.transition = 'all 0.4s ease';
-
-            // Clear the initial countdown from storage as it's no longer needed
-            localStorage.removeItem(INITIAL_COUNTDOWN_STORAGE_KEY);
-
-            setTimeout(() => {
-                countdownOverlay.classList.remove('active');
+        if (hasExamStarted) {
+            // Exam already started: Kill everything overlay-related immediately
+            if (countdownOverlay) countdownOverlay.style.display = 'none';
+            if (pageWrapper) {
                 pageWrapper.style.filter = 'none';
                 pageWrapper.style.pointerEvents = 'auto';
-            }, 400);
-        };
+                pageWrapper.style.transition = 'none';
+            }
+        } else {
+            // Exam NOT started: Run countdown logic
+            let savedCountdown = localStorage.getItem(INITIAL_COUNTDOWN_STORAGE_KEY);
+            let initialCountdown = savedCountdown !== null ? parseInt(savedCountdown) : {{ config.get('countdown_before_exam', 30) }};
+
+            if (initialTimerEl) {
+                initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
+            }
+
+            // Apply starting blur/state
+            if (pageWrapper) {
+                pageWrapper.style.transition = 'filter 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                pageWrapper.style.filter = 'blur(15px) saturate(1.2)';
+                pageWrapper.style.pointerEvents = 'none';
+            }
+
+            const initialInterval = setInterval(() => {
+                initialCountdown--;
+                if (initialCountdown <= 0) {
+                    clearInterval(initialInterval);
+                    localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, "0");
+                    if (initialTimerEl) {
+                        initialTimerEl.innerHTML = "00";
+                        initialTimerEl.style.color = "#10b981";
+                    }
+                    const countdownBox = document.getElementById('countdown-box');
+                    if (countdownBox) {
+                        countdownBox.classList.add('ready');
+                        setTimeout(() => {
+                            countdownBox.style.opacity = '0';
+                            countdownBox.style.height = '0';
+                            countdownBox.style.margin = '0';
+                            countdownBox.style.padding = '0';
+                            countdownBox.style.overflow = 'hidden';
+                            setTimeout(() => {
+                                countdownBox.style.display = 'none';
+                                if (readyBtnCont) {
+                                    readyBtnCont.style.display = 'block';
+                                    readyBtnCont.style.animation = 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                                }
+                            }, 300);
+                        }, 500);
+                    } else if (readyBtnCont) {
+                        readyBtnCont.style.display = 'block';
+                    }
+                } else {
+                    localStorage.setItem(INITIAL_COUNTDOWN_STORAGE_KEY, initialCountdown.toString());
+                    if (initialTimerEl) {
+                        initialTimerEl.innerText = initialCountdown < 10 ? '0' + initialCountdown : initialCountdown;
+                    }
+                }
+            }, 1000);
+
+            const startBtn = document.getElementById('readyToStartBtn');
+            if (startBtn) {
+                startBtn.onclick = function (e) {
+                    if (e) { e.preventDefault(); e.stopPropagation(); }
+                    
+                    // Trigger Fullscreen FIRST (User gesture requirement)
+                    enterFullScreen();
+                    
+                    // Persistent start flag
+                    localStorage.setItem(EXAM_STARTED_KEY, 'true');
+                    
+                    // UI transitions
+                    if (countdownOverlay) {
+                        countdownOverlay.style.opacity = '0';
+                        countdownOverlay.style.transform = 'scale(0.9)';
+                        countdownOverlay.style.transition = 'all 0.4s ease';
+                    }
+
+                    setTimeout(() => {
+                        if (countdownOverlay) countdownOverlay.style.display = 'none';
+                        if (pageWrapper) {
+                            pageWrapper.style.filter = 'none';
+                            pageWrapper.style.pointerEvents = 'auto';
+                        }
+                    }, 400);
+
+                    logReadyStatus();
+                };
+            }
+        }
         // --- End Start Countdown Logic ---
 
         console.log("🚀 Exam Initialized. Storage Key:", LOCAL_STORAGE_KEY);
@@ -1280,10 +1351,28 @@
         }
 
         function enterFullScreen() {
-            const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            const el = document.documentElement || document.body;
+            try {
+                if (el.requestFullscreen) {
+                    const promise = el.requestFullscreen();
+                    if (promise !== undefined) {
+                        promise.catch((err) => {
+                            console.error('Fullscreen denied by browser:', err.message);
+                            if (err.name !== 'TypeError') {
+                                alert("Your browser blocked automatic full-screen mode. For the best exam experience, please press F11 to enter full-screen manually.");
+                            }
+                        });
+                    }
+                } else if (el.mozRequestFullScreen) { /* Firefox */
+                    el.mozRequestFullScreen();
+                } else if (el.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                    el.webkitRequestFullscreen();
+                } else if (el.msRequestFullscreen) { /* IE/Edge */
+                    el.msRequestFullscreen();
+                }
+            } catch (err) {
+                console.error('Fullscreen request failed', err);
+            }
         }
 
         async function handleFullScreenExit() {
